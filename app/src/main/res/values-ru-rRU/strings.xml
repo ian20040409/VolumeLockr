@@ -22,6 +22,8 @@
 
     <string name="limiting_header">Ограничения громкости</string>
     <string name="allow_lower">Разрешить снижение громкости</string>
+    <string name="lock_all">Заблокировать всё</string>
+    <string name="unlock_all">Разблокировать всё</string>
     <string name="aboutLibraries_description_text">VolumeLockr</string>
 
 </resources>
