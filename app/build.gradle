@@ -13,8 +13,8 @@ android {
         applicationId "com.klee.volumelockr"
         minSdkVersion 21
         targetSdkVersion 36
-        versionCode 18
-        versionName "1.8.1"
+        versionCode 19
+        versionName "1.8.2"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
