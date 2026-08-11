@@ -79,7 +79,7 @@ class AboutActivity : AppCompatActivity() {
         }.onFailure {
             // Fallback to standard intent if custom tabs fail
             runCatching {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                super.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             }
         }
     }
@@ -90,6 +90,28 @@ class AboutActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun startActivity(intent: Intent?) {
+        startActivity(intent, null)
+    }
+
+    private var isOpeningUrl = false
+
+    override fun startActivity(intent: Intent?, options: Bundle?) {
+        if (!isOpeningUrl && intent?.action == Intent.ACTION_VIEW) {
+            val url = intent.dataString
+            if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                isOpeningUrl = true
+                try {
+                    openUrl(url)
+                } finally {
+                    isOpeningUrl = false
+                }
+                return
+            }
+        }
+        super.startActivity(intent, options)
     }
 
     private fun findRecyclerView(view: View): RecyclerView? {
