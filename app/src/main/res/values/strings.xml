@@ -31,6 +31,12 @@
     <string name="pair_with_phone_description">Open the VolumeLockr app on your phone, go to \'TV Remote\', and enter this IP address:</string>
     <string name="pair_with_phone_message">Open the VolumeLockr app on your phone, go to \'TV Remote\', and enter this IP address:\n\n%1$s</string>
 
+    <!-- About Screen Strings -->
+    <string name="about_app_description">Simple and powerful volume lock &amp; TV remote tool for Android and Android TV.</string>
+    <string name="github_repo_ian">GitHub Repository</string>
+    <string name="github_repo_original">Original Project (jonathanklee)</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
+
     <string name="media_title">Media</string>
     <string name="alarm_title">Alarm</string>
     <string name="notification_title">Ring / Notification</string>
