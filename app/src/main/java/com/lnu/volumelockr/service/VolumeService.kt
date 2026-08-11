@@ -94,18 +94,22 @@ class VolumeService : Service() {
             tryShowNotification()
         }
 
-        if (mVolumeLock.isEmpty()) {
+        if (mVolumeLock.isEmpty() && !isTvMode()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(Service.STOP_FOREGROUND_REMOVE)
             }
             stopSelf()
         }
         
-        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
-        if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
+        if (isTvMode()) {
             mTvRemoteServer = TvRemoteServer(this, mServiceScope)
             mTvRemoteServer?.start()
         }
+    }
+
+    private fun isTvMode(): Boolean {
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        return uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -320,7 +324,9 @@ class VolumeService : Service() {
                 throw error
             }
 
-            stopSelf()
+            if (!isTvMode()) {
+                stopSelf()
+            }
         }
     }
 
@@ -332,7 +338,10 @@ class VolumeService : Service() {
         }
 
         stopForeground(Service.STOP_FOREGROUND_REMOVE)
-        stopSelf()
+        
+        if (!isTvMode()) {
+            stopSelf()
+        }
     }
 
     private fun createNotificationContentIntent(): PendingIntent {

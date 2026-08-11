@@ -83,21 +83,20 @@ class TvRemoteFragment : Fragment() {
             return
         }
         
+        Toast.makeText(context, "Connecting via ADB to $targetIp...", Toast.LENGTH_SHORT).show()
+        
         scope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val url = URL("http://$targetIp:8080/launch_app")
-                    val connection = url.openConnection() as HttpURLConnection
-                    connection.connectTimeout = 3000
-                    connection.readTimeout = 3000
-                    connection.requestMethod = "GET"
-                    connection.responseCode
-                    connection.disconnect()
-                } catch (e: Exception) {
-                    // Ignore
+            val result = com.lnu.volumelockr.adb.AdbController.launchTvApp(requireContext(), targetIp)
+            
+            withContext(Dispatchers.Main) {
+                if (result == "SUCCESS") {
+                    Toast.makeText(context, "App launched on TV!", Toast.LENGTH_SHORT).show()
+                } else if (result == "AUTH_REQUIRED") {
+                    Toast.makeText(context, "Check TV screen! Please click 'Allow USB Debugging' using your TV remote, then try again.", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, "ADB Error: $result", Toast.LENGTH_LONG).show()
                 }
             }
-            Toast.makeText(context, "Launch command sent to $targetIp", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -111,8 +110,13 @@ class TvRemoteFragment : Fragment() {
                     connection.connectTimeout = 3000
                     connection.readTimeout = 3000
                     connection.requestMethod = "GET"
-                    connection.responseCode
+                    val code = connection.responseCode
                     connection.disconnect()
+                    
+                    if (code == 200 && endpoint == "hide_icon") {
+                        // Use ADB to restart the launcher so the ghost icon is removed immediately
+                        com.lnu.volumelockr.adb.AdbController.forceStopLaunchers(requireContext(), currentIp)
+                    }
                 } catch (e: Exception) {
                     // Ignore
                 }
