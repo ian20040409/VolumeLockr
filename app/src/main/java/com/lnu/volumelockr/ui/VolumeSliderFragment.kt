@@ -47,11 +47,12 @@ class VolumeSliderFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireContext().registerReceiver(uiUpdateReceiver, android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            requireContext().registerReceiver(uiUpdateReceiver, android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"))
-        }
+        androidx.core.content.ContextCompat.registerReceiver(
+            requireContext(),
+            uiUpdateReceiver,
+            android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"),
+            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         binding.allowLowerSwitch.setOnCheckedChangeListener(null)
@@ -136,7 +137,7 @@ class VolumeSliderFragment : Fragment() {
         dialogView.findViewById<android.widget.TextView>(R.id.ip_address_text)?.text = ipAddress
 
         val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setIcon(R.drawable.devices_other_48px)
+            .setIcon(R.drawable.host_48px)
             .setTitle(R.string.pair_with_phone_title)
             .setView(dialogView)
             .setPositiveButton(android.R.string.ok, null)

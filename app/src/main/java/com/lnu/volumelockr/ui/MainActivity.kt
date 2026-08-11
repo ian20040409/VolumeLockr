@@ -29,6 +29,66 @@ class MainActivity : AppCompatActivity() {
         setupWindowInsets()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkPermissions()
+    }
+
+    private var isDndDialogShowing = false
+
+    private fun checkPermissions() {
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+
+        val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        if (!isTv && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted) {
+            if (!isDndDialogShowing) {
+                isDndDialogShowing = true
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("需要勿擾模式權限")
+                    .setMessage("請授予勿擾模式(DND)權限，否則將無法調整與鎖定鈴聲音量。")
+                    .setPositiveButton("前往設定") { _, _ ->
+                        isDndDialogShowing = false
+                        try {
+                            val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    .setNegativeButton("忽略") { dialog, _ ->
+                        isDndDialogShowing = false
+                        dialog.dismiss()
+                        checkPostNotificationsPermission()
+                    }
+                    .setOnCancelListener {
+                        isDndDialogShowing = false
+                        checkPostNotificationsPermission()
+                    }
+                    .show()
+            }
+            return
+        }
+
+        checkPostNotificationsPermission()
+    }
+
+    private fun checkPostNotificationsPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    101
+                )
+            }
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options, menu)
         

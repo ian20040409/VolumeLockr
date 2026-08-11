@@ -13,8 +13,8 @@ android {
         applicationId "com.lnu.volumelockr"
         minSdkVersion 21
         targetSdkVersion 37
-        versionCode 26
-        versionName "2.4"
+        versionCode 27
+        versionName "2.5"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -37,6 +37,9 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+    lint {
+        disable 'MissingTranslation'
     }
     namespace 'com.lnu.volumelockr'
 }

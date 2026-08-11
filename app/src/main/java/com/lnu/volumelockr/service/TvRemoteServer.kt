@@ -129,7 +129,9 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                 prefs.edit().putBoolean("hide_tv_unlock_ui", hide).apply()
                 
                 // Broadcast to update UI
-                context.sendBroadcast(Intent("com.lnu.volumelockr.ACTION_UI_UPDATE"))
+                val intent = Intent("com.lnu.volumelockr.ACTION_UI_UPDATE")
+                intent.setPackage(context.packageName)
+                context.sendBroadcast(intent)
                 sendResponse(output, 200, "OK")
             } else if (requestLine.startsWith("GET /launch_app")) {
                 val launchIntent = Intent(context, com.lnu.volumelockr.ui.MainActivity::class.java).apply {
@@ -160,7 +162,17 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                     .setFullScreenIntent(pendingIntent, true)
                     .build()
                 
-                notificationManager.notify(999, notification)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    if (androidx.core.content.ContextCompat.checkSelfPermission(
+                            context,
+                            android.Manifest.permission.POST_NOTIFICATIONS
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                    ) {
+                        notificationManager.notify(999, notification)
+                    }
+                } else {
+                    notificationManager.notify(999, notification)
+                }
                 
                 // Try standard start just in case it's allowed
                 try {

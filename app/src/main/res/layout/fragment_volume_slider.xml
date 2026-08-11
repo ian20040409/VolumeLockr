@@ -94,7 +94,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="16dp"
                 android:text="@string/pair_device_show_ip"
-                app:icon="@drawable/devices_other_48px"
+                app:icon="@drawable/host_48px"
                 android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton

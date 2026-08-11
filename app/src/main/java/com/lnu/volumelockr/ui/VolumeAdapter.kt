@@ -30,11 +30,13 @@ class VolumeAdapter(
             AudioManager.STREAM_MUSIC to R.drawable.ic_media,
             AudioManager.STREAM_VOICE_CALL to R.drawable.ic_call,
             AudioManager.STREAM_NOTIFICATION to R.drawable.ic_bell,
+            AudioManager.STREAM_RING to R.drawable.ic_bell,
             AudioManager.STREAM_ALARM to R.drawable.ic_alarm
         )
 
         private val STREAM_CONTAINER_COLORS = mapOf(
             AudioManager.STREAM_MUSIC to MaterialR.attr.colorPrimaryContainer,
+            AudioManager.STREAM_RING to MaterialR.attr.colorSecondaryContainer,
             AudioManager.STREAM_VOICE_CALL to MaterialR.attr.colorTertiaryContainer,
             AudioManager.STREAM_NOTIFICATION to MaterialR.attr.colorSecondaryContainer,
             AudioManager.STREAM_ALARM to MaterialR.attr.colorErrorContainer
@@ -42,6 +44,7 @@ class VolumeAdapter(
 
         private val STREAM_ON_CONTAINER_COLORS = mapOf(
             AudioManager.STREAM_MUSIC to MaterialR.attr.colorOnPrimaryContainer,
+            AudioManager.STREAM_RING to MaterialR.attr.colorOnSecondaryContainer,
             AudioManager.STREAM_VOICE_CALL to MaterialR.attr.colorOnTertiaryContainer,
             AudioManager.STREAM_NOTIFICATION to MaterialR.attr.colorOnSecondaryContainer,
             AudioManager.STREAM_ALARM to MaterialR.attr.colorOnErrorContainer
@@ -71,9 +74,10 @@ class VolumeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val volume = mVolumeList[position]
+        val isLocked = mService?.getLocks()?.containsKey(volume.stream) == true
         holder.binding.mediaTextView.text = volume.name
         holder.binding.streamIcon.setImageResource(STREAM_ICONS[volume.stream] ?: R.drawable.ic_media)
-        applyStreamColors(holder, volume.stream)
+        applyStreamColors(holder, volume.stream, isLocked)
         holder.binding.slider.value = mService?.getLocks()?.get(volume.stream)?.toFloat() ?: volume.value.toFloat()
         holder.binding.slider.valueFrom = volume.min.toFloat()
         holder.binding.slider.valueTo = volume.max.toFloat()
@@ -116,13 +120,23 @@ class VolumeAdapter(
         holder.binding.lockButton.onFocusChangeListener = focusChangeListener
     }
 
-    private fun applyStreamColors(holder: ViewHolder, stream: Int) {
-        val containerAttr = STREAM_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorPrimaryContainer
-        val onContainerAttr = STREAM_ON_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorOnPrimaryContainer
+    private fun applyStreamColors(holder: ViewHolder, stream: Int, isLocked: Boolean) {
+        val containerAttr = if (isLocked) MaterialR.attr.colorSurfaceVariant else (STREAM_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorPrimaryContainer)
+        val onContainerAttr = if (isLocked) MaterialR.attr.colorOutline else (STREAM_ON_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorOnPrimaryContainer)
+
         val containerColor = MaterialColors.getColor(holder.binding.root, containerAttr)
         val onContainerColor = MaterialColors.getColor(holder.binding.root, onContainerAttr)
+
         holder.binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
         holder.binding.streamIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
+
+        holder.binding.slider.thumbTintList = ColorStateList.valueOf(onContainerColor)
+        holder.binding.slider.trackActiveTintList = ColorStateList.valueOf(onContainerColor)
+        holder.binding.slider.trackInactiveTintList = ColorStateList.valueOf(containerColor)
+
+        val alphaVal = if (isLocked) 0.5f else 1.0f
+        holder.binding.mediaTextView.alpha = alphaVal
+        holder.binding.volumeValue.alpha = alphaVal
     }
 
     private fun formatVolumeValue(value: Int, max: Int): String = "$value / $max"
@@ -177,17 +191,19 @@ class VolumeAdapter(
 
     private fun loadLockFromService(holder: ViewHolder, volume: Volume) {
         val isLocked = mService?.getLocks()?.containsKey(volume.stream) == true
-        applyLockedState(holder, isLocked)
+        applyLockedState(holder, volume, isLocked)
         holder.binding.slider.isEnabled = !isLocked
     }
 
-    private fun applyLockedState(holder: ViewHolder, isLocked: Boolean) {
+    private fun applyLockedState(holder: ViewHolder, volume: Volume, isLocked: Boolean) {
         val iconRes = if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
         val tintAttr = if (isLocked) android.R.attr.colorPrimary else MaterialR.attr.colorOnSurfaceVariant
         val tintColor = MaterialColors.getColor(holder.binding.root, tintAttr)
 
         holder.binding.lockButton.icon = ContextCompat.getDrawable(mContext, iconRes)
         holder.binding.lockButton.iconTint = ColorStateList.valueOf(tintColor)
+
+        applyStreamColors(holder, volume.stream, isLocked)
     }
 
     private fun adjustService() {
@@ -225,7 +241,7 @@ class VolumeAdapter(
             adjustService()
             adjustNotification()
             holder.binding.slider.isEnabled = false
-            applyLockedState(holder, true)
+            applyLockedState(holder, volume, true)
             onLockStateChanged?.invoke()
         }
     }
@@ -236,7 +252,7 @@ class VolumeAdapter(
             adjustService()
             adjustNotification()
             holder.binding.slider.isEnabled = true
-            applyLockedState(holder, false)
+            applyLockedState(holder, volume, false)
             onLockStateChanged?.invoke()
         }
     }
