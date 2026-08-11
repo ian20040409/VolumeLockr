@@ -17,6 +17,7 @@
         android:icon="@mipmap/ic_volumelockr"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_volumelockr_round"
+        android:banner="@drawable/tv_banner"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.VolumeLockr">
@@ -34,6 +35,9 @@
         <activity-alias
             android:name=".TvLauncherAlias"
             android:targetActivity=".ui.MainActivity"
+            android:banner="@drawable/tv_banner"
+            android:icon="@mipmap/ic_volumelockr"
+            android:label="@string/app_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
