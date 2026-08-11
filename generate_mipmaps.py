@@ -1,36 +1,43 @@
 import os
 import shutil
-from PIL import Image
 
-raw_icon_path = "/Users/linenyou/Github/VolumeLockr/icon_2/icon2.png"
-app_res_dir = "/Users/linenyou/Github/VolumeLockr/app/src/main/res"
+src_base = "/Users/linenyou/Github/VolumeLockr/icon_2/android_icon2/res"
+dst_base = "/Users/linenyou/Github/VolumeLockr/app/src/main/res"
 
-mipmap_sizes = {
-    "mdpi": 48,
-    "hdpi": 72,
-    "xhdpi": 96,
-    "xxhdpi": 144,
-    "xxxhdpi": 192,
-}
+if os.path.exists(src_base):
+    # 1. Copy all contents of android_icon2/res directly to app/src/main/res
+    for root, dirs, files in os.walk(src_base):
+        rel_path = os.path.relpath(root, src_base)
+        target_dir = os.path.join(dst_base, rel_path) if rel_path != "." else dst_base
+        os.makedirs(target_dir, exist_ok=True)
+        for f in files:
+            if not f.startswith("."):
+                src_f = os.path.join(root, f)
+                dst_f = os.path.join(target_dir, f)
+                shutil.copy2(src_f, dst_f)
+                print(f"Copied {rel_path}/{f}")
 
-if os.path.exists(raw_icon_path):
-    icon_img = Image.open(raw_icon_path).convert("RGBA")
-    
-    for density, size in mipmap_sizes.items():
-        out_dir = os.path.join(app_res_dir, f"mipmap-{density}")
-        os.makedirs(out_dir, exist_ok=True)
-        
-        resized_icon = icon_img.resize((size, size), Image.Resampling.LANCZOS)
-        
-        # Save as ic_volumelockr.png and ic_launcher.png
-        for name in ["ic_volumelockr.png", "ic_launcher.png"]:
-            out_path = os.path.join(out_dir, name)
-            resized_icon.save(out_path, "PNG")
-            print(f"Generated {out_path} ({size}x{size})")
-            
-    # Also update the play store icon and fastlane icon
-    playstore_icon = icon_img.resize((512, 512), Image.Resampling.LANCZOS)
-    playstore_icon.save("/Users/linenyou/Github/VolumeLockr/app/src/main/ic_volumelockr-playstore.png", "PNG")
-    os.makedirs("/Users/linenyou/Github/VolumeLockr/fastlane/metadata/android/en-US/images", exist_ok=True)
-    playstore_icon.save("/Users/linenyou/Github/VolumeLockr/fastlane/metadata/android/en-US/images/icon.png", "PNG")
-    print("Updated Play Store icons.")
+    # 2. Duplicate icons for ic_volumelockr / round icon references
+    densities = ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"]
+    for d in densities:
+        d_dir = os.path.join(dst_base, f"mipmap-{d}")
+        src_png = os.path.join(d_dir, "ic_launcher.png")
+        if os.path.exists(src_png):
+            for name in ["ic_volumelockr.png", "ic_launcher_round.png", "ic_volumelockr_round.png"]:
+                shutil.copy2(src_png, os.path.join(d_dir, name))
+
+    # 3. For anydpi-v26 XML files
+    anydpi_dir = os.path.join(dst_base, "mipmap-anydpi-v26")
+    src_xml = os.path.join(anydpi_dir, "ic_launcher.xml")
+    if os.path.exists(src_xml):
+        for name in ["ic_volumelockr.xml", "ic_launcher_round.xml", "ic_volumelockr_round.xml"]:
+            shutil.copy2(src_xml, os.path.join(anydpi_dir, name))
+
+    # 4. Copy playstore icon
+    src_playstore = "/Users/linenyou/Github/VolumeLockr/icon_2/android_icon2/play_store_512.png"
+    if os.path.exists(src_playstore):
+        shutil.copy2(src_playstore, "/Users/linenyou/Github/VolumeLockr/app/src/main/ic_volumelockr-playstore.png")
+        fastlane_dir = "/Users/linenyou/Github/VolumeLockr/fastlane/metadata/android/en-US/images"
+        os.makedirs(fastlane_dir, exist_ok=True)
+        shutil.copy2(src_playstore, os.path.join(fastlane_dir, "icon.png"))
+        print("Copied play_store_512.png")

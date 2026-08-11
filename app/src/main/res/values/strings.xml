@@ -60,5 +60,8 @@
     <string name="password_protected_summary">Require a password to change lock settings</string>
     <string name="change_password_summary">Set or update the unlock password</string>
 
+    <string name="tv_settings_header">TV Settings</string>
+    <string name="hide_app_icon_summary">Hide or show the application icon on the Android TV home screen</string>
+
     <string name="aboutLibraries_description_text">VolumeLockr</string>
 </resources>

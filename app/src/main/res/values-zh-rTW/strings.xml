@@ -61,5 +61,8 @@
     <string name="password_protected_summary">更改鎖定設定時需要輸入密碼</string>
     <string name="change_password_summary">設定或更新解鎖密碼</string>
 
+    <string name="tv_settings_header">電視設定</string>
+    <string name="hide_app_icon_summary">在 Android TV 桌面上隱藏或顯示應用程式圖示</string>
+
     <string name="aboutLibraries_description_text">VolumeLockr</string>
 </resources>

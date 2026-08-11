@@ -1,7 +1,9 @@
 package com.lnu.volumelockr.ui
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,6 +30,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         const val PASSWORD_PROTECTED_PREFERENCE = "password_protected"
         const val PASSWORD_CHANGE_PREFERENCE = "password"
         const val ALLOW_LOWER_PREFERENCE = "allow_lower"
+        const val HIDE_TV_LAUNCHER_ICON_PREFERENCE = "hide_tv_launcher_icon"
         const val DELAY_IN_MS = 100L
         const val MIN_PASSWORD_LENGTH = 6
         private const val ENCRYPTED_PREFS_FILE = "secure_settings"
@@ -38,6 +41,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var passwordProtected: SwitchPreferenceCompat
     private lateinit var passwordChange: Preference
     private lateinit var shouldAllowLower: SwitchPreferenceCompat
+    private var hideTvLauncherIcon: SwitchPreferenceCompat? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -46,10 +50,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
         shouldAllowLower = findPreference(ALLOW_LOWER_PREFERENCE)!!
         passwordChange = findPreference(PASSWORD_CHANGE_PREFERENCE)!!
         passwordProtected = findPreference(PASSWORD_PROTECTED_PREFERENCE)!!
+        hideTvLauncherIcon = findPreference(HIDE_TV_LAUNCHER_ICON_PREFERENCE)
 
         shouldAllowLower.setOnPreferenceChangeListener { preferences, _ ->
             VolumeService.start(preferences.context)
             true
+        }
+
+        hideTvLauncherIcon?.let { pref ->
+            val context = requireContext()
+            pref.isChecked = isTvLauncherIconHidden(context)
+            pref.setOnPreferenceChangeListener { _, newValue ->
+                setTvLauncherIconHidden(context, newValue as Boolean)
+                true
+            }
         }
 
         passwordChange.isEnabled = !passwordProtected.isChecked
@@ -67,6 +81,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         passwordProtected.isEnabled = isPasswordSet()
+    }
+
+    private fun isTvLauncherIconHidden(context: Context): Boolean {
+        val componentName = ComponentName(context, "${context.packageName}.TvLauncherAlias")
+        val state = context.packageManager.getComponentEnabledSetting(componentName)
+        return state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+    }
+
+    private fun setTvLauncherIconHidden(context: Context, hide: Boolean) {
+        val componentName = ComponentName(context, "${context.packageName}.TvLauncherAlias")
+        val newState = if (hide) {
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+        } else {
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+        }
+        context.packageManager.setComponentEnabledSetting(
+            componentName,
+            newState,
+            PackageManager.DONT_KILL_APP
+        )
     }
 
     private fun initializeEncryptedPrefs() {

@@ -24,4 +24,17 @@
 
   </PreferenceCategory>
 
+  <PreferenceCategory 
+      app:title="@string/tv_settings_header"
+      app:isPreferenceVisible="false">
+
+    <SwitchPreferenceCompat
+        app:key="hide_tv_launcher_icon"
+        app:title="@string/hide_app_icon"
+        app:summary="@string/hide_app_icon_summary"
+        app:singleLineTitle="false"
+        app:defaultValue="false" />
+
+  </PreferenceCategory>
+
 </PreferenceScreen>
