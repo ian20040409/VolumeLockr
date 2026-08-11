@@ -1,8 +1,27 @@
+# IDE / Built files
 .idea
 .gradle
-local.properties
-build/
 .kotlin/
 .DS_Store
+build/
+*.iml
+*.class
 
+# Built artifacts
 /app/release
+*.apk
+*.aab
+
+# Local configuration & Keystore / Secrets (避免金鑰與密碼外洩)
+local.properties
+key.properties
+signing.properties
+*.jks
+*.keystore
+*.pepk
+google-services.json
+
+# Profiling & Native builds
+captures/
+.externalNativeBuild/
+.cxx/
