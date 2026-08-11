@@ -24,6 +24,7 @@
     <string name="toast_connection_failed">Connection failed. Is the TV app open?</string>
     <string name="toast_command_sent">Command sent</string>
     <string name="toast_command_failed">Failed to send command</string>
+    <string name="toast_grant_dnd">Please grant Do Not Disturb access to change this volume</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">Pair Device (Show IP)</string>
@@ -39,7 +40,8 @@
 
     <string name="media_title">Media</string>
     <string name="alarm_title">Alarm</string>
-    <string name="notification_title">Ring / Notification</string>
+    <string name="ring_title">Ring</string>
+    <string name="notification_title">Notification</string>
     <string name="call_title">Call</string>
 
     <string name="password_header">Password</string>

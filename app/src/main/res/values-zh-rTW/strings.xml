@@ -25,6 +25,7 @@
     <string name="toast_connection_failed">連線失敗。電視端的應用程式開啟了嗎？</string>
     <string name="toast_command_sent">已傳送指令</string>
     <string name="toast_command_failed">無法傳送指令</string>
+    <string name="toast_grant_dnd">請先授權「零打擾」存取權限，才能調整此音量</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">配對裝置 (顯示 IP)</string>
@@ -40,7 +41,8 @@
 
     <string name="media_title">媒體</string>
     <string name="alarm_title">鬧鐘</string>
-    <string name="notification_title">鈴聲 / 通知</string>
+    <string name="ring_title">鈴聲</string>
+    <string name="notification_title">通知</string>
     <string name="call_title">通話</string>
 
     <string name="password_header">密碼</string>

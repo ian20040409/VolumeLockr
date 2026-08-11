@@ -230,7 +230,7 @@ class VolumeService : Service() {
     @Synchronized
     private fun checkVolumes() {
         for ((stream, volume) in mVolumeLock) {
-            if (stream == AudioManager.STREAM_NOTIFICATION && mMode != AudioManager.RINGER_MODE_NORMAL) {
+            if ((stream == AudioManager.STREAM_NOTIFICATION || stream == AudioManager.STREAM_RING) && mMode != AudioManager.RINGER_MODE_NORMAL) {
                 continue
             }
             val current = mAudioManager.getStreamVolume(stream)

@@ -130,11 +130,32 @@ class VolumeAdapter(
     private fun registerSeekBarCallback(holder: ViewHolder, volume: Volume) {
         holder.binding.slider.clearOnChangeListeners()
         holder.binding.slider.addOnChangeListener(
-            Slider.OnChangeListener { _, value, _ ->
-                val canSetVolume = volume.stream != AudioManager.STREAM_NOTIFICATION ||
-                    mService?.getMode() == AudioManager.RINGER_MODE_NORMAL
-                if (canSetVolume) {
+            Slider.OnChangeListener { slider, value, fromUser ->
+                if (!fromUser) return@OnChangeListener
+
+                if (volume.stream == AudioManager.STREAM_RING || volume.stream == AudioManager.STREAM_NOTIFICATION) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        val nm = holder.binding.root.context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                        if (!nm.isNotificationPolicyAccessGranted) {
+                            android.widget.Toast.makeText(holder.binding.root.context, holder.binding.root.context.getString(com.lnu.volumelockr.R.string.toast_grant_dnd), android.widget.Toast.LENGTH_LONG).show()
+                            // Snap slider back
+                            slider.value = mAudioManager.getStreamVolume(volume.stream).toFloat()
+                            // Launch settings
+                            try {
+                                val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                                holder.binding.root.context.startActivity(intent)
+                            } catch (e: Exception) {
+                                // Ignore
+                            }
+                            return@OnChangeListener
+                        }
+                    }
+                }
+
+                try {
                     mAudioManager.setStreamVolume(volume.stream, value.toInt(), 0)
+                } catch (e: SecurityException) {
+                    // Ignore if user removed DND permissions
                 }
 
                 volume.value = value.toInt()
@@ -192,10 +213,8 @@ class VolumeAdapter(
     }
 
     private fun handleRingerMode(holder: ViewHolder, volume: Volume) {
-        if (volume.stream == AudioManager.STREAM_NOTIFICATION) {
-            holder.binding.slider.isEnabled =
-                mService?.getMode() == AudioManager.RINGER_MODE_NORMAL &&
-                mService?.getLocks()?.containsKey(AudioManager.STREAM_NOTIFICATION) == false
+        if (volume.stream == AudioManager.STREAM_NOTIFICATION || volume.stream == AudioManager.STREAM_RING) {
+            holder.binding.slider.isEnabled = mService?.getLocks()?.containsKey(volume.stream) == false
         }
     }
 
