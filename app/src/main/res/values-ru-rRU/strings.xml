@@ -5,8 +5,6 @@
     <string name="options">Настройки</string>
     <string name="about">О приложении</string>
     <string name="home">Домашняя</string>
-    <string name="dialog_policy_access_title">Для обнаружения изменений режима звонков (Беззвучный, Вибрация, Обычный) VolumeLockr необходим доступ в режиме «Не беспокоить».</string>
-    <string name="dialog_allow">Разрешить</string>
 
     <string name="media_title">Медиа</string>
     <string name="alarm_title">Будильник</string>

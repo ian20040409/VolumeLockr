@@ -5,8 +5,6 @@
     <string name="options">Opzioni</string>
     <string name="about">Informazioni</string>
     <string name="home">Home</string>
-    <string name="dialog_policy_access_title">Per rilevare le modifiche alla modalità suoneria (Silenzioso, Vibrazione, Normale), VolumeLockr richiede l\'accesso a "Non disturbare".</string>
-    <string name="dialog_allow">Consenti</string>
 
     <string name="media_title">Media</string>
     <string name="alarm_title">Sveglia</string>

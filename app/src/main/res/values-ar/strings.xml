@@ -5,8 +5,6 @@
     <string name="options">خيارات</string>
     <string name="about">عن</string>
     <string name="home">الرئيسية</string>
-    <string name="dialog_policy_access_title">لكي يتم اكتشاف تغييرات وضع الرنين (صامت، اهتزاز، عادي)، يحتاج VolumeLockr إلى إذن \"عدم الإزعاج \"</string>
-    <string name="dialog_allow">سماح</string>
 
     <string name="media_title">الوسائط</string>
     <string name="alarm_title">المنبه</string>

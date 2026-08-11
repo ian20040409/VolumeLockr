@@ -90,6 +90,20 @@ class VolumeAdapter(
             holder.binding.slider.isEnabled = false
             holder.binding.lockButton.isEnabled = false
         }
+
+        setupFocusAnimations(holder)
+    }
+
+    private fun setupFocusAnimations(holder: ViewHolder) {
+        val focusChangeListener = android.view.View.OnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                view.animate().scaleX(1.05f).scaleY(1.05f).translationZ(8f).setDuration(150).start()
+            } else {
+                view.animate().scaleX(1f).scaleY(1f).translationZ(0f).setDuration(150).start()
+            }
+        }
+        holder.binding.slider.onFocusChangeListener = focusChangeListener
+        holder.binding.lockButton.onFocusChangeListener = focusChangeListener
     }
 
     private fun applyStreamColors(holder: ViewHolder, stream: Int) {

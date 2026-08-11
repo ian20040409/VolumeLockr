@@ -71,6 +71,16 @@ class VolumeSliderFragment : Fragment() {
         binding.lockAllChip.setOnClickListener { lockAll() }
         binding.unlockAllChip.setOnClickListener { unlockAll() }
         updateQuickActionState()
+
+        val focusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                view.animate().scaleX(1.05f).scaleY(1.05f).translationZ(8f).setDuration(150).start()
+            } else {
+                view.animate().scaleX(1f).scaleY(1f).translationZ(0f).setDuration(150).start()
+            }
+        }
+        binding.lockAllChip.onFocusChangeListener = focusChangeListener
+        binding.unlockAllChip.onFocusChangeListener = focusChangeListener
     }
 
     private fun lockAll() {

@@ -5,8 +5,6 @@
     <string name="options">Optionen</string>
     <string name="about">Über</string>
     <string name="home">Startseite</string>
-    <string name="dialog_policy_access_title">Um Änderungen des Klingeltonmodus (Lautlos, Vibration, Normal) zu erkennen, benötigt VolumeLockr Zugriff auf „Nicht stören".</string>
-    <string name="dialog_allow">Erlauben</string>
 
     <string name="media_title">Medien</string>
     <string name="alarm_title">Alarm</string>

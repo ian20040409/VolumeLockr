@@ -9,18 +9,29 @@ class VolumeProvider(private val mContext: Context) {
 
     private val mAudioManager = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+    private val isTv: Boolean
+        get() {
+            val uiModeManager = mContext.getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
+            return uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        }
+
     fun getVolumes(): List<Volume> {
         val resource = mContext.resources
-        return listOf(
-            Volume(
-                resource.getString(R.string.media_title),
-                AudioManager.STREAM_MUSIC,
-                fetchVolume(AudioManager.STREAM_MUSIC),
-                0,
-                fetchMaxVolume(AudioManager.STREAM_MUSIC),
-                false
-            ),
+        val mediaVolume = Volume(
+            resource.getString(R.string.media_title),
+            AudioManager.STREAM_MUSIC,
+            fetchVolume(AudioManager.STREAM_MUSIC),
+            0,
+            fetchMaxVolume(AudioManager.STREAM_MUSIC),
+            false
+        )
 
+        if (isTv) {
+            return listOf(mediaVolume)
+        }
+
+        return listOf(
+            mediaVolume,
             Volume(
                 resource.getString(R.string.call_title),
                 AudioManager.STREAM_VOICE_CALL,

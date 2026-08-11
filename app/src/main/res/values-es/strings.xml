@@ -5,8 +5,6 @@
     <string name="options">Opciones</string>
     <string name="about">Acerca de</string>
     <string name="home">Inicio</string>
-    <string name="dialog_policy_access_title">Para detectar cambios en el modo de timbre (Silencio, Vibración, Normal), VolumeLockr necesita acceso a "No molestar".</string>
-    <string name="dialog_allow">Permitir</string>
 
     <string name="media_title">Multimedia</string>
     <string name="alarm_title">Alarma</string>

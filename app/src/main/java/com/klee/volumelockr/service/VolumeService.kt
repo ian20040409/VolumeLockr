@@ -101,7 +101,7 @@ class VolumeService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        mAllowLower = sharedPreferences.getBoolean(ALLOW_LOWER_PREFERENCE, false)
+        mAllowLower = sharedPreferences.getBoolean(ALLOW_LOWER_PREFERENCE, true)
 
         mMode = Settings.Global.getInt(contentResolver, MODE_RINGER_SETTING)
 

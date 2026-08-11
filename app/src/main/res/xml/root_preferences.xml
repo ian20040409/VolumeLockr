@@ -6,7 +6,7 @@
         app:key="allow_lower"
         app:title="@string/allow_lower"
         app:summary="@string/allow_lower_summary"
-        app:defaultValue="false" />
+        app:defaultValue="true" />
 
   </PreferenceCategory>
 

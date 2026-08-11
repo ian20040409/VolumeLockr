@@ -1,12 +1,9 @@
 package com.klee.volumelockr.ui
 
-import android.app.NotificationManager
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -32,16 +29,14 @@ class MainActivity : AppCompatActivity() {
         setupWindowInsets()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkDoNotDisturbPermission()
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options, menu)
+        
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
+            menu.findItem(R.id.about)?.isVisible = false
+        }
+        
         return true
     }
 
@@ -67,15 +62,10 @@ class MainActivity : AppCompatActivity() {
 
         val navView: NavigationBarView? = binding.bottomNavigation ?: binding.navigationRail
         navView?.setupWithNavController(navController)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun checkDoNotDisturbPermission() {
-        val notificationManager =
-            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        if (!notificationManager.isNotificationPolicyAccessGranted) {
-            PolicyAccessDialog().show(supportFragmentManager, PolicyAccessDialog.TAG)
+        
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
+            (navView as? android.view.View)?.visibility = android.view.View.GONE
         }
     }
 
