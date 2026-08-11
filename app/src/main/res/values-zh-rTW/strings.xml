@@ -7,6 +7,30 @@
     <string name="about">關於</string>
     <string name="home">首頁</string>
     <string name="tv_remote">電視遙控器</string>
+    <string name="tv_connection">電視連線</string>
+    <string name="tv_ip_address_hint">電視 IP 位址 (例如：192.168.1.100)</string>
+    <string name="hide_app_icon">從電視桌面隱藏應用程式圖示</string>
+    <string name="hide_unlock_options">在電視上隱藏解鎖選項</string>
+    <string name="launch_tv_app">啟動電視應用程式</string>
+    <string name="connect">連線</string>
+    <string name="unlock">解鎖</string>
+
+    <!-- TvRemoteFragment Toasts -->
+    <string name="toast_enter_ip">請輸入 IP 位址</string>
+    <string name="toast_connecting_adb">正透過 ADB 連線至 %1$s...</string>
+    <string name="toast_app_launched">已在電視上啟動應用程式！</string>
+    <string name="toast_auth_required">請查看電視畫面！請使用電視遙控器點擊「允許 USB 偵錯」，然後再試一次。</string>
+    <string name="toast_adb_error">ADB 錯誤：%1$s</string>
+    <string name="toast_connected">已連線！</string>
+    <string name="toast_connection_failed">連線失敗。電視端的應用程式開啟了嗎？</string>
+    <string name="toast_command_sent">已傳送指令</string>
+    <string name="toast_command_failed">無法傳送指令</string>
+
+    <!-- Pairing Dialog Strings -->
+    <string name="pair_device_show_ip">配對裝置 (顯示 IP)</string>
+    <string name="pair_with_phone_title">與手機配對</string>
+    <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr 應用程式，前往「電視遙控器」並輸入此 IP 位址：</string>
+    <string name="pair_with_phone_message">請在手機上開啟 VolumeLockr 應用程式，前往「電視遙控器」並輸入此 IP 位址：\n\n%1$s</string>
 
     <string name="media_title">媒體</string>
     <string name="alarm_title">鬧鐘</string>

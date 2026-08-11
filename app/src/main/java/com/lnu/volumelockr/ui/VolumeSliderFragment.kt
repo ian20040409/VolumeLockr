@@ -108,11 +108,21 @@ class VolumeSliderFragment : Fragment() {
 
     private fun showPairingDialog() {
         val ipAddress = getLocalIpAddress() ?: "Unknown"
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Pair with Phone")
-            .setMessage("Open the VolumeLockr app on your phone, go to 'TV Remote', and enter this IP address:\n\n$ipAddress")
-            .setPositiveButton("OK", null)
-            .show()
+        val dialogView = layoutInflater.inflate(R.layout.dialog_pairing, null)
+        dialogView.findViewById<android.widget.TextView>(R.id.ip_address_text)?.text = ipAddress
+
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setIcon(R.drawable.devices_other_48px)
+            .setTitle(R.string.pair_with_phone_title)
+            .setView(dialogView)
+            .setPositiveButton(android.R.string.ok, null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.requestFocus()
+        }
+
+        dialog.show()
     }
 
     private fun getLocalIpAddress(): String? {

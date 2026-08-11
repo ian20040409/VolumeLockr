@@ -6,6 +6,30 @@
     <string name="about">About</string>
     <string name="home">Home</string>
     <string name="tv_remote">TV Remote</string>
+    <string name="tv_connection">TV Connection</string>
+    <string name="tv_ip_address_hint">TV IP Address (e.g. 192.168.1.100)</string>
+    <string name="hide_app_icon">Hide App Icon from TV Launcher</string>
+    <string name="hide_unlock_options">Hide Unlock Options on TV</string>
+    <string name="launch_tv_app">Launch TV App</string>
+    <string name="connect">Connect</string>
+    <string name="unlock">Unlock</string>
+
+    <!-- TvRemoteFragment Toasts -->
+    <string name="toast_enter_ip">Please enter an IP address</string>
+    <string name="toast_connecting_adb">Connecting via ADB to %1$s...</string>
+    <string name="toast_app_launched">App launched on TV!</string>
+    <string name="toast_auth_required">Check TV screen! Please click \'Allow USB Debugging\' using your TV remote, then try again.</string>
+    <string name="toast_adb_error">ADB Error: %1$s</string>
+    <string name="toast_connected">Connected!</string>
+    <string name="toast_connection_failed">Connection failed. Is the TV app open?</string>
+    <string name="toast_command_sent">Command sent</string>
+    <string name="toast_command_failed">Failed to send command</string>
+
+    <!-- Pairing Dialog Strings -->
+    <string name="pair_device_show_ip">Pair Device (Show IP)</string>
+    <string name="pair_with_phone_title">Pair with Phone</string>
+    <string name="pair_with_phone_description">Open the VolumeLockr app on your phone, go to \'TV Remote\', and enter this IP address:</string>
+    <string name="pair_with_phone_message">Open the VolumeLockr app on your phone, go to \'TV Remote\', and enter this IP address:\n\n%1$s</string>
 
     <string name="media_title">Media</string>
     <string name="alarm_title">Alarm</string>

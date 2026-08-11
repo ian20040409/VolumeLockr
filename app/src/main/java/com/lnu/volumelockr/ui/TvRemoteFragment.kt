@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.lnu.volumelockr.R
 import com.lnu.volumelockr.databinding.FragmentTvRemoteBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +51,7 @@ class TvRemoteFragment : Fragment() {
                 currentIp = ip
                 testConnection()
             } else {
-                Toast.makeText(context, "Please enter an IP address", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.toast_enter_ip, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -79,22 +80,22 @@ class TvRemoteFragment : Fragment() {
     private fun sendLaunchCommand() {
         val targetIp = currentIp.ifEmpty { binding.ipAddressInput.text.toString().trim() }
         if (targetIp.isEmpty()) {
-            Toast.makeText(context, "Please enter an IP address", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.toast_enter_ip, Toast.LENGTH_SHORT).show()
             return
         }
         
-        Toast.makeText(context, "Connecting via ADB to $targetIp...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(R.string.toast_connecting_adb, targetIp), Toast.LENGTH_SHORT).show()
         
         scope.launch {
             val result = com.lnu.volumelockr.adb.AdbController.launchTvApp(requireContext(), targetIp)
             
             withContext(Dispatchers.Main) {
                 if (result == "SUCCESS") {
-                    Toast.makeText(context, "App launched on TV!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.toast_app_launched, Toast.LENGTH_SHORT).show()
                 } else if (result == "AUTH_REQUIRED") {
-                    Toast.makeText(context, "Check TV screen! Please click 'Allow USB Debugging' using your TV remote, then try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, R.string.toast_auth_required, Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(context, "ADB Error: $result", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.toast_adb_error, result), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -149,7 +150,7 @@ class TvRemoteFragment : Fragment() {
             }
             binding.connectButton.isEnabled = true
             if (pingResult != null && pingResult.startsWith("OK")) {
-                Toast.makeText(context, "Connected!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.toast_connected, Toast.LENGTH_SHORT).show()
                 binding.controlCard.visibility = View.VISIBLE
                 
                 val parts = pingResult.split(",")
@@ -175,7 +176,7 @@ class TvRemoteFragment : Fragment() {
                 prefs.edit().putString("recent_ips", recentIps.joinToString(",")).apply()
                 setupIpAdapter(recentIps)
             } else {
-                Toast.makeText(context, "Connection failed. Is the TV app open?", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.toast_connection_failed, Toast.LENGTH_SHORT).show()
                 binding.controlCard.visibility = View.GONE
             }
         }
@@ -205,9 +206,9 @@ class TvRemoteFragment : Fragment() {
                 }
             }
             if (success) {
-                Toast.makeText(context, "Command sent", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.toast_command_sent, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(context, "Failed to send command", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.toast_command_failed, Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -23,7 +23,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TV Connection"
+                android:text="@string/tv_connection"
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:hint="TV IP Address (e.g. 192.168.1.100)">
+                android:hint="@string/tv_ip_address_hint">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/ip_address_input"
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:checked="true"
-                android:text="Hide App Icon from TV Launcher" />
+                android:text="@string/hide_app_icon" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/hide_unlock_switch"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:checked="true"
-                android:text="Hide Unlock Options on TV" />
+                android:text="@string/hide_unlock_options" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -68,7 +68,7 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Launch TV App" />
+                    android:text="@string/launch_tv_app" />
 
                 <View
                     android:layout_width="0dp"
@@ -79,7 +79,7 @@
                     android:id="@+id/connect_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Connect" />
+                    android:text="@string/connect" />
             </LinearLayout>
 
         </LinearLayout>
@@ -104,7 +104,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Media Volume"
+                android:text="@string/media_title"
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
 
             <LinearLayout
@@ -145,13 +145,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="Unlock" />
+                    android:text="@string/unlock" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/lock_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lock" />
+                    android:text="@string/lock" />
 
             </LinearLayout>
 

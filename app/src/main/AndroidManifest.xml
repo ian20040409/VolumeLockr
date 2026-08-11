@@ -32,6 +32,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.AboutActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
         <activity-alias
             android:name=".TvLauncherAlias"
             android:targetActivity=".ui.MainActivity"
