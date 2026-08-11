@@ -1,4 +1,4 @@
-package com.klee.volumelockr.ui
+package com.lnu.volumelockr.ui
 
 import android.content.ComponentName
 import android.content.Context
@@ -15,9 +15,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import com.klee.volumelockr.R
-import com.klee.volumelockr.databinding.FragmentVolumeSliderBinding
-import com.klee.volumelockr.service.VolumeService
+import com.lnu.volumelockr.R
+import com.lnu.volumelockr.databinding.FragmentVolumeSliderBinding
+import com.lnu.volumelockr.service.VolumeService
 
 class VolumeSliderFragment : Fragment() {
 
@@ -26,6 +26,15 @@ class VolumeSliderFragment : Fragment() {
     private var mAdapter: VolumeAdapter? = null
     private var mService: VolumeService? = null
     private var isServiceBound = false
+
+    private val uiUpdateReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.lnu.volumelockr.ACTION_UI_UPDATE") {
+                updateQuickActionState()
+                mAdapter?.notifyDataSetChanged()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +47,12 @@ class VolumeSliderFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireContext().registerReceiver(uiUpdateReceiver, android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            requireContext().registerReceiver(uiUpdateReceiver, android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"))
+        }
+        
         mService?.let {
             handleServiceConnected()
         } ?: Intent(context, VolumeService::class.java).also { intent ->
@@ -46,6 +61,7 @@ class VolumeSliderFragment : Fragment() {
     }
 
     override fun onPause() {
+        requireContext().unregisterReceiver(uiUpdateReceiver)
         unbindServiceIfNeeded()
         clearSubtitle()
         super.onPause()
@@ -81,6 +97,41 @@ class VolumeSliderFragment : Fragment() {
         }
         binding.lockAllChip.onFocusChangeListener = focusChangeListener
         binding.unlockAllChip.onFocusChangeListener = focusChangeListener
+        binding.tvPairButton.onFocusChangeListener = focusChangeListener
+
+        val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
+            binding.tvPairButton.visibility = View.VISIBLE
+            binding.tvPairButton.setOnClickListener { showPairingDialog() }
+        }
+    }
+
+    private fun showPairingDialog() {
+        val ipAddress = getLocalIpAddress() ?: "Unknown"
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Pair with Phone")
+            .setMessage("Open the VolumeLockr app on your phone, go to 'TV Remote', and enter this IP address:\n\n$ipAddress")
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    private fun getLocalIpAddress(): String? {
+        try {
+            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val intf = interfaces.nextElement()
+                val addrs = intf.inetAddresses
+                while (addrs.hasMoreElements()) {
+                    val addr = addrs.nextElement()
+                    if (!addr.isLoopbackAddress && addr is java.net.Inet4Address) {
+                        return addr.hostAddress
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     private fun lockAll() {
@@ -115,6 +166,18 @@ class VolumeSliderFragment : Fragment() {
             .getBoolean(SettingsFragment.PASSWORD_PROTECTED_PREFERENCE, false)
         binding.lockAllChip.isEnabled = !isProtected
         binding.unlockAllChip.isEnabled = !isProtected
+        
+        val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        val hideUnlock = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean("hide_tv_unlock_ui", true)
+        
+        if (isTv && hideUnlock) {
+            binding.lockAllChip.visibility = View.GONE
+            binding.unlockAllChip.visibility = View.GONE
+        } else {
+            binding.lockAllChip.visibility = View.VISIBLE
+            binding.unlockAllChip.visibility = View.VISIBLE
+        }
     }
 
     private fun updateSubtitle() {

@@ -1,9 +1,9 @@
-package com.klee.volumelockr
+package com.lnu.volumelockr
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.klee.volumelockr.service.VolumeService
+import com.lnu.volumelockr.service.VolumeService
 
 class BootReceiver : BroadcastReceiver() {
 

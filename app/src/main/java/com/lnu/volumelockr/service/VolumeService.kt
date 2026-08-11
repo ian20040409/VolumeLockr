@@ -1,4 +1,4 @@
-package com.klee.volumelockr.service
+package com.lnu.volumelockr.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -22,10 +22,10 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.klee.volumelockr.R
-import com.klee.volumelockr.ui.MainActivity
-import com.klee.volumelockr.ui.SettingsFragment.Companion.ALLOW_LOWER_PREFERENCE
-import com.klee.volumelockr.ui.Volume
+import com.lnu.volumelockr.R
+import com.lnu.volumelockr.ui.MainActivity
+import com.lnu.volumelockr.ui.SettingsFragment.Companion.ALLOW_LOWER_PREFERENCE
+import com.lnu.volumelockr.ui.Volume
 import java.util.Timer
 import java.util.TimerTask
 
@@ -76,6 +76,9 @@ class VolumeService : Service() {
     private var mTimer: Timer? = null
     private var mAllowLower = false
     private var mAllowLowerListener: (() -> Unit)? = null
+    
+    private var mTvRemoteServer: TvRemoteServer? = null
+    private val mServiceScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default)
 
     override fun onCreate() {
         super.onCreate()
@@ -97,6 +100,12 @@ class VolumeService : Service() {
             }
             stopSelf()
         }
+        
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
+            mTvRemoteServer = TvRemoteServer(this, mServiceScope)
+            mTvRemoteServer?.start()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -104,6 +113,28 @@ class VolumeService : Service() {
         mAllowLower = sharedPreferences.getBoolean(ALLOW_LOWER_PREFERENCE, true)
 
         mMode = Settings.Global.getInt(contentResolver, MODE_RINGER_SETTING)
+
+        if (intent?.action == "com.lnu.volumelockr.ACTION_SET_LOCK") {
+            val stream = intent.getIntExtra("stream", -1)
+            if (stream != -1) {
+                val locked = intent.getBooleanExtra("locked", true)
+                if (locked) {
+                    val volume = intent.getIntExtra("volume", -1)
+                    if (volume != -1) {
+                        addLock(stream, volume)
+                        if (mTimer == null) {
+                            startLocking()
+                        }
+                    }
+                } else {
+                    removeLock(stream)
+                    if (mVolumeLock.isEmpty()) {
+                        stopLocking()
+                    }
+                }
+                invokeVolumeListenerCallback()
+            }
+        }
 
         return START_STICKY
     }
@@ -341,6 +372,8 @@ class VolumeService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        mTvRemoteServer?.stop()
+        mServiceScope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
         unregisterObservers()
         stopLocking()
     }

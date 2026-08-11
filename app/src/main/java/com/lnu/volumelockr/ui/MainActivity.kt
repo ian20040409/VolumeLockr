@@ -1,4 +1,4 @@
-package com.klee.volumelockr.ui
+package com.lnu.volumelockr.ui
 
 import android.os.Bundle
 import android.view.Menu
@@ -12,8 +12,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationBarView
-import com.klee.volumelockr.R
-import com.klee.volumelockr.databinding.ActivityMainBinding
+import com.lnu.volumelockr.R
+import com.lnu.volumelockr.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

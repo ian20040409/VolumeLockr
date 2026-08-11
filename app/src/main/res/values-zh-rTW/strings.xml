@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VolumeLockr</string>
+    <string name="title">VolumeLockr</string>
+    <string name="lock">鎖定</string>
+    <string name="options">設定</string>
+    <string name="about">關於</string>
+    <string name="home">首頁</string>
+
+    <string name="media_title">媒體</string>
+    <string name="alarm_title">鬧鐘</string>
+    <string name="notification_title">鈴聲 / 通知</string>
+    <string name="call_title">通話</string>
+
+    <string name="password_header">密碼</string>
+    <string name="password_protected">啟用密碼保護</string>
+    <string name="change_password">更改密碼</string>
+    <string name="enter_password">輸入密碼</string>
+    <string name="password_too_short">密碼長度必須至少為 %d 個字元</string>
+    <string name="password_save_error">儲存密碼失敗</string>
+
+    <string name="limiting_header">音量限制</string>
+    <string name="allow_lower">允許調低音量</string>
+
+    <string name="lock_all">全部鎖定</string>
+    <string name="unlock_all">全部解鎖</string>
+    <string name="locked_subtitle">已鎖定 %1$d / %2$d</string>
+
+    <string name="allow_lower_summary">允許系統將音量調低至鎖定數值以下</string>
+    <string name="password_protected_summary">更改鎖定設定時需要輸入密碼</string>
+    <string name="change_password_summary">設定或更新解鎖密碼</string>
+
+    <string name="aboutLibraries_description_text">VolumeLockr</string>
+</resources>

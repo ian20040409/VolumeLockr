@@ -10,4 +10,9 @@
         android:icon="@drawable/ic_settings"
         android:title="@string/options" />
 
+    <item
+        android:id="@+id/tvRemoteFragment"
+        android:icon="@drawable/ic_lock"
+        android:title="TV Remote" />
+
 </menu>

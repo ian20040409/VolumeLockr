@@ -1,4 +1,4 @@
-package com.klee.volumelockr.ui
+package com.lnu.volumelockr.ui
 
 import android.app.Application
 import com.google.android.material.color.DynamicColors

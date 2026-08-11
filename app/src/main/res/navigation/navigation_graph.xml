@@ -10,12 +10,12 @@
 
     <fragment
         android:id="@+id/about_libraries"
-        android:name="com.klee.volumelockr.ui.AboutFragment"
+        android:name="com.lnu.volumelockr.ui.AboutFragment"
         android:label="@string/about" />
 
     <fragment
         android:id="@+id/volumeSliderFragment"
-        android:name="com.klee.volumelockr.ui.VolumeSliderFragment"
+        android:name="com.lnu.volumelockr.ui.VolumeSliderFragment"
         android:label="@string/app_name">
         <action
             android:id="@+id/action_x_to_about_libs"
@@ -27,7 +27,12 @@
 
     <fragment
       android:id="@+id/settingsFragment"
-      android:name="com.klee.volumelockr.ui.SettingsFragment"
+      android:name="com.lnu.volumelockr.ui.SettingsFragment"
       android:label="@string/options" />
+
+    <fragment
+        android:id="@+id/tvRemoteFragment"
+        android:name="com.lnu.volumelockr.ui.TvRemoteFragment"
+        android:label="TV Remote" />
 
 </navigation>

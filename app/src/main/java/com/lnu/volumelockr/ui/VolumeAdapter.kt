@@ -1,4 +1,4 @@
-package com.klee.volumelockr.ui
+package com.lnu.volumelockr.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -12,9 +12,9 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
-import com.klee.volumelockr.R
-import com.klee.volumelockr.databinding.VolumeCardBinding
-import com.klee.volumelockr.service.VolumeService
+import com.lnu.volumelockr.R
+import com.lnu.volumelockr.databinding.VolumeCardBinding
+import com.lnu.volumelockr.service.VolumeService
 import com.google.android.material.R as MaterialR
 
 class VolumeAdapter(
@@ -89,6 +89,16 @@ class VolumeAdapter(
         if (isPasswordProtected()) {
             holder.binding.slider.isEnabled = false
             holder.binding.lockButton.isEnabled = false
+        }
+        
+        val uiModeManager = mContext.getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        val hideUnlock = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("hide_tv_unlock_ui", true)
+        
+        if (isTv && hideUnlock) {
+            holder.binding.lockButton.visibility = android.view.View.GONE
+        } else {
+            holder.binding.lockButton.visibility = android.view.View.VISIBLE
         }
 
         setupFocusAnimations(holder)

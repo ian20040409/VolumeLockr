@@ -10,7 +10,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.klee.volumelockr"
+        applicationId "com.lnu.volumelockr"
         minSdkVersion 21
         targetSdkVersion 36
         versionCode 19
@@ -37,7 +37,7 @@ android {
     buildFeatures {
         viewBinding true
     }
-    namespace 'com.klee.volumelockr'
+    namespace 'com.lnu.volumelockr'
 }
 
 dependencies {

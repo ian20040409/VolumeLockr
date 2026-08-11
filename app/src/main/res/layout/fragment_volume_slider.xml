@@ -55,4 +55,14 @@
         android:paddingBottom="8dp"
         android:clipToPadding="false" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tv_pair_button"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:text="Pair Device (Show IP)"
+        android:visibility="gone" />
+
 </LinearLayout>

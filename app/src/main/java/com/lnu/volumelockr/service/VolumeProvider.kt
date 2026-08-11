@@ -1,9 +1,9 @@
-package com.klee.volumelockr.service
+package com.lnu.volumelockr.service
 
 import android.content.Context
 import android.media.AudioManager
-import com.klee.volumelockr.R
-import com.klee.volumelockr.ui.Volume
+import com.lnu.volumelockr.R
+import com.lnu.volumelockr.ui.Volume
 
 class VolumeProvider(private val mContext: Context) {
 

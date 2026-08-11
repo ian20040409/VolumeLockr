@@ -1,4 +1,4 @@
-package com.klee.volumelockr
+package com.lnu.volumelockr
 
 import org.junit.Test
 
