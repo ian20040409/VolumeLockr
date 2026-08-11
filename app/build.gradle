@@ -54,6 +54,7 @@ dependencies {
     implementation libs.aboutlibraries
     implementation libs.preference.ktx
     implementation libs.security.crypto
+    implementation 'androidx.browser:browser:1.8.0'
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

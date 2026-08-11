@@ -44,6 +44,7 @@
     <string name="ring_title">鈴聲</string>
     <string name="notification_title">通知</string>
     <string name="call_title">通話</string>
+    <string name="open_system_sound_settings">前往系統鈴聲設定</string>
 
     <string name="password_header">密碼</string>
     <string name="password_protected">啟用密碼保護</string>

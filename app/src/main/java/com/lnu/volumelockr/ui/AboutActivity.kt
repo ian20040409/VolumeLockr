@@ -72,7 +72,15 @@ class AboutActivity : AppCompatActivity() {
 
     private fun openUrl(url: String) {
         runCatching {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            val customTabsIntent = androidx.browser.customtabs.CustomTabsIntent.Builder()
+                .setShowTitle(true)
+                .build()
+            customTabsIntent.launchUrl(this, Uri.parse(url))
+        }.onFailure {
+            // Fallback to standard intent if custom tabs fail
+            runCatching {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
         }
     }
 

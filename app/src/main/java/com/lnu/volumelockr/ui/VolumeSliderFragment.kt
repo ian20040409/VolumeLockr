@@ -103,6 +103,16 @@ class VolumeSliderFragment : Fragment() {
         if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
             binding.tvPairButton.visibility = View.VISIBLE
             binding.tvPairButton.setOnClickListener { showPairingDialog() }
+            binding.systemSoundSettingsButton.visibility = View.GONE
+        } else {
+            binding.systemSoundSettingsButton.setOnClickListener {
+                try {
+                    val intent = Intent(android.provider.Settings.ACTION_SOUND_SETTINGS)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
 
