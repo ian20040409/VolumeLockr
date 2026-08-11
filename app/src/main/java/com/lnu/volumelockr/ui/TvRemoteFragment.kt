@@ -127,7 +127,7 @@ class TvRemoteFragment : Fragment() {
     private fun testConnection() {
         binding.connectButton.isEnabled = false
         scope.launch {
-            val success = withContext(Dispatchers.IO) {
+            val pingResult = withContext(Dispatchers.IO) {
                 try {
                     val url = URL("http://$currentIp:8080/ping")
                     val connection = url.openConnection() as HttpURLConnection
@@ -135,16 +135,31 @@ class TvRemoteFragment : Fragment() {
                     connection.readTimeout = 3000
                     connection.requestMethod = "GET"
                     val responseCode = connection.responseCode
-                    connection.disconnect()
-                    responseCode == 200
+                    if (responseCode == 200) {
+                        val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
+                        connection.disconnect()
+                        responseBody
+                    } else {
+                        connection.disconnect()
+                        null
+                    }
                 } catch (e: Exception) {
-                    false
+                    null
                 }
             }
             binding.connectButton.isEnabled = true
-            if (success) {
+            if (pingResult != null && pingResult.startsWith("OK")) {
                 Toast.makeText(context, "Connected!", Toast.LENGTH_SHORT).show()
                 binding.controlCard.visibility = View.VISIBLE
+                
+                val parts = pingResult.split(",")
+                if (parts.size >= 3) {
+                    val maxVol = parts[1].toFloatOrNull() ?: 15f
+                    val currVol = parts[2].toFloatOrNull() ?: 0f
+                    binding.volumeSlider.valueTo = maxVol
+                    binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
+                }
+                
                 sendConfigCommand("hide_icon", binding.hideIconSwitch.isChecked)
                 sendConfigCommand("hide_unlock", binding.hideUnlockSwitch.isChecked)
                 

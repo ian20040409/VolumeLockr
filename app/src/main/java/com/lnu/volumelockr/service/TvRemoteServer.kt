@@ -2,6 +2,7 @@ package com.lnu.volumelockr.service
 
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,7 +56,10 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
             Log.d("TvRemoteServer", "Request: $requestLine")
 
             if (requestLine.startsWith("GET /ping")) {
-                sendResponse(output, 200, "OK")
+                val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                val currentVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+                sendResponse(output, 200, "OK,$maxVolume,$currentVolume")
             } else if (requestLine.startsWith("GET /set_lock")) {
                 val parts = requestLine.split(" ")
                 if (parts.size >= 2) {
