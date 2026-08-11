@@ -63,6 +63,34 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationBarView? = binding.bottomNavigation ?: binding.navigationRail
         navView?.setupWithNavController(navController)
         
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val view = navView?.findViewById<android.view.View>(destination.id)
+            val iconView = view?.findViewById<android.widget.ImageView>(com.google.android.material.R.id.navigation_bar_item_icon_view)
+            iconView?.apply {
+                if (destination.id == R.id.settingsFragment) {
+                    animate()
+                        .rotationBy(180f)
+                        .setDuration(500)
+                        .start()
+                } else {
+                    scaleX = 0.8f
+                    scaleY = 0.8f
+                    animate()
+                        .scaleX(1.2f)
+                        .scaleY(1.2f)
+                        .setDuration(350)
+                        .withEndAction {
+                            animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(400)
+                                .start()
+                        }
+                        .start()
+                }
+            }
+        }
+        
         val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
         if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
             (navView as? android.view.View)?.visibility = android.view.View.GONE

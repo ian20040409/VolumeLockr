@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/tvRemoteFragment"
-        android:icon="@drawable/ic_lock"
-        android:title="TV Remote" />
+        android:icon="@drawable/settings_remote_48px"
+        android:title="@string/tv_remote" />
 
 </menu>
