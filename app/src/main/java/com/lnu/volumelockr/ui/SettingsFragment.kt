@@ -46,6 +46,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         initializeEncryptedPrefs()
+        
+        val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        if (isTv) {
+            findPreference<SwitchPreferenceCompat>("autostart_on_boot")?.isVisible = false
+        }
 
         shouldAllowLower = findPreference(ALLOW_LOWER_PREFERENCE)!!
         passwordChange = findPreference(PASSWORD_CHANGE_PREFERENCE)!!

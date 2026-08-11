@@ -25,6 +25,7 @@
     <string name="toast_command_sent">Command sent</string>
     <string name="toast_command_failed">Failed to send command</string>
     <string name="toast_grant_dnd">Please grant Do Not Disturb access to change this volume</string>
+    <string name="toast_autostarted">VolumeLockr started</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">Pair Device (Show IP)</string>
@@ -54,6 +55,8 @@
 
     <string name="limiting_header">Volume Limits</string>
     <string name="allow_lower">Allow lowering volume</string>
+    <string name="autostart_on_boot">Autostart on boot</string>
+    <string name="autostart_on_boot_summary">Automatically start VolumeLockr after device restart</string>
 
     <string name="lock_all">Lock all</string>
     <string name="unlock_all">Unlock all</string>

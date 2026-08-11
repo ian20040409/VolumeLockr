@@ -1,5 +1,11 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
+  <SwitchPreferenceCompat
+      app:key="autostart_on_boot"
+      app:title="@string/autostart_on_boot"
+      app:summary="@string/autostart_on_boot_summary"
+      app:defaultValue="true" />
+
   <PreferenceCategory app:title="@string/limiting_header">
 
     <SwitchPreferenceCompat
