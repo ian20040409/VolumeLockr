@@ -53,6 +53,14 @@ class VolumeSliderFragment : Fragment() {
             requireContext().registerReceiver(uiUpdateReceiver, android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"))
         }
         
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        binding.allowLowerSwitch.setOnCheckedChangeListener(null)
+        binding.allowLowerSwitch.isChecked = prefs.getBoolean(SettingsFragment.ALLOW_LOWER_PREFERENCE, true)
+        binding.allowLowerSwitch.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean(SettingsFragment.ALLOW_LOWER_PREFERENCE, isChecked).apply()
+            VolumeService.start(requireContext())
+        }
+        
         mService?.let {
             handleServiceConnected()
         } ?: Intent(context, VolumeService::class.java).also { intent ->

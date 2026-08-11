@@ -72,7 +72,7 @@ class VolumeService : Service() {
     private var mModeListener: (() -> Unit)? = null
     private val mBinder = LocalBinder()
     private var mVolumeLock = HashMap<Int, Int>()
-    private var mMode: Int = 2
+
     private var mTimer: Timer? = null
     private var mAllowLower = false
     private var mAllowLowerListener: (() -> Unit)? = null
@@ -116,7 +116,7 @@ class VolumeService : Service() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         mAllowLower = sharedPreferences.getBoolean(ALLOW_LOWER_PREFERENCE, true)
 
-        mMode = Settings.Global.getInt(contentResolver, MODE_RINGER_SETTING)
+
 
         if (intent?.action == "com.lnu.volumelockr.ACTION_SET_LOCK") {
             val stream = intent.getIntExtra("stream", -1)
@@ -204,7 +204,7 @@ class VolumeService : Service() {
     }
 
     fun getMode(): Int {
-        return mMode
+        return mAudioManager.ringerMode
     }
 
     private fun savePreferences() {
@@ -230,9 +230,6 @@ class VolumeService : Service() {
     @Synchronized
     private fun checkVolumes() {
         for ((stream, volume) in mVolumeLock) {
-            if ((stream == AudioManager.STREAM_NOTIFICATION || stream == AudioManager.STREAM_RING) && mMode != AudioManager.RINGER_MODE_NORMAL) {
-                continue
-            }
             val current = mAudioManager.getStreamVolume(stream)
             if ((current > volume) || (!mAllowLower && current != volume)) {
                 try {
@@ -262,7 +259,7 @@ class VolumeService : Service() {
         override fun onChange(selfChange: Boolean) {
             super.onChange(selfChange)
 
-            mMode = Settings.Global.getInt(contentResolver, MODE_RINGER_SETTING)
+
 
             mModeListener?.invoke()
         }
