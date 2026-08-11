@@ -67,4 +67,5 @@
     <string name="hide_app_icon_summary">Hide or show the application icon on the Android TV home screen</string>
 
     <string name="aboutLibraries_description_text">VolumeLockr</string>
+    <string name="back">Back</string>
 </resources>

@@ -17,6 +17,7 @@ material = "1.13.0"
 navigationFragmentKtx = "2.9.5"
 preferenceKtx = "1.2.1"
 securityCrypto = "1.1.0-alpha06"
+zxing = "3.5.3"
 
 [libraries]
 aboutlibraries = { module = "com.mikepenz:aboutlibraries", version.ref = "aboutlibraries" }
@@ -39,6 +40,7 @@ navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-kt
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
 preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

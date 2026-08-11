@@ -31,8 +31,17 @@ class AboutActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
         supportActionBar?.title = getString(R.string.about)
+        
+        if (isTv) {
+            supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            binding.btnBackTv.visibility = View.VISIBLE
+            binding.btnBackTv.setOnClickListener { finish() }
+        } else {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        }
 
         try {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
@@ -71,6 +80,14 @@ class AboutActivity : AppCompatActivity() {
     }
 
     private fun openUrl(url: String) {
+        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
+        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        
+        if (isTv) {
+            showQrCodeDialog(url)
+            return
+        }
+
         runCatching {
             val customTabsIntent = androidx.browser.customtabs.CustomTabsIntent.Builder()
                 .setShowTitle(true)
@@ -80,7 +97,39 @@ class AboutActivity : AppCompatActivity() {
             // Fallback to standard intent if custom tabs fail
             runCatching {
                 super.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }.onFailure {
+                showQrCodeDialog(url)
             }
+        }
+    }
+
+    private fun showQrCodeDialog(url: String) {
+        runCatching {
+            val size = 512
+            val bits = com.google.zxing.qrcode.QRCodeWriter().encode(url, com.google.zxing.BarcodeFormat.QR_CODE, size, size)
+            val bmp = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.RGB_565)
+            for (x in 0 until size) {
+                for (y in 0 until size) {
+                    bmp.setPixel(x, y, if (bits[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+                }
+            }
+            
+            val imageView = android.widget.ImageView(this).apply {
+                setImageBitmap(bmp)
+                setPadding(32, 32, 32, 32)
+            }
+            
+            val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(url)
+                .setView(imageView)
+                .setPositiveButton(android.R.string.ok, null)
+                .create()
+                
+            dialog.setOnShowListener {
+                dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.requestFocus()
+            }
+            
+            dialog.show()
         }
     }
 

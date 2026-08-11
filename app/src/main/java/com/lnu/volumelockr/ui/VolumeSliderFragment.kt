@@ -112,6 +112,7 @@ class VolumeSliderFragment : Fragment() {
             binding.tvPairButton.visibility = View.VISIBLE
             binding.tvPairButton.setOnClickListener { showPairingDialog() }
             binding.systemSoundSettingsButton.visibility = View.GONE
+            binding.aboutButton.visibility = View.VISIBLE
         } else {
             binding.systemSoundSettingsButton.setOnClickListener {
                 try {
@@ -121,6 +122,11 @@ class VolumeSliderFragment : Fragment() {
                     e.printStackTrace()
                 }
             }
+            binding.aboutButton.visibility = View.GONE
+        }
+        
+        binding.aboutButton.setOnClickListener {
+            startActivity(Intent(requireContext(), AboutActivity::class.java))
         }
     }
 
@@ -200,11 +206,9 @@ class VolumeSliderFragment : Fragment() {
         val hideUnlock = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean("hide_tv_unlock_ui", true)
         
         if (isTv && hideUnlock) {
-            binding.lockAllChip.visibility = View.GONE
-            binding.unlockAllChip.visibility = View.GONE
+            binding.topActionContainer.visibility = View.GONE
         } else {
-            binding.lockAllChip.visibility = View.VISIBLE
-            binding.unlockAllChip.visibility = View.VISIBLE
+            binding.topActionContainer.visibility = View.VISIBLE
         }
     }
 
