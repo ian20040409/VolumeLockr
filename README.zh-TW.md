@@ -6,7 +6,7 @@ VolumeLockr 是一款用於控制 Android 裝置音量並為各個音量頻道�
 
 ## Fork 說明與 GPLv3 條款聲明
 
-本專案為原始 VolumeLockr (com.klee.volumelockr) 的修改分支版本。
+本專案為 [原始 VolumeLockr (com.klee.volumelockr)](https://github.com/jonathanklee/VolumeLockr) 的修改分支版本。
 應用程式套件名稱已調整為 `com.lnu.volumelockr`。
 
 ### 主要修改項目

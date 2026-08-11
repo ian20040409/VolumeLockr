@@ -6,7 +6,7 @@ VolumeLockr allows you to control your Android device volume levels and set lock
 
 ## Fork Notice & GPLv3 Compliance
 
-This project is a modified fork of the original VolumeLockr (com.klee.volumelockr).
+This project is a modified fork of the [original VolumeLockr (com.klee.volumelockr)](https://github.com/jonathanklee/VolumeLockr).
 The package name has been changed to `com.lnu.volumelockr`.
 
 ### Key Modifications
