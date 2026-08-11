@@ -19,3 +19,17 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Suppress missing annotation warnings
+-dontwarn javax.annotation.concurrent.GuardedBy
+
+# Keep line numbers for stack traces in release builds
+-keepattributes SourceFile,LineNumberTable
+
+# Gson rules
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn com.google.gson.**
+
+# AboutLibraries
+-keep class com.mikepenz.aboutlibraries.** { *; }
