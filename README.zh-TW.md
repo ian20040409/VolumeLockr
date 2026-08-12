@@ -1,13 +1,13 @@
-# VolumeLockr
+# VolumeLockr PLUS
 
 [English](README.md) | [繁體中文](README.zh-TW.md)
 
-VolumeLockr 是一款用於控制 Android 裝置音量並為各個音量頻道設置鎖定狀態的應用程式。
+VolumeLockr PLUS 是一款用於控制 Android 裝置音量並為各個音量頻道設置鎖定狀態的應用程式。
 
 ## Fork 說明與 GPLv3 條款聲明
 
 本專案為 [原始 VolumeLockr (com.klee.volumelockr)](https://github.com/jonathanklee/VolumeLockr) 的修改分支版本。
-應用程式套件名稱已調整為 `com.lnu.volumelockr`。
+應用程式套件名稱已調整為 `com.lnu.volumelockr.plus`。
 
 ### 主要修改項目
 

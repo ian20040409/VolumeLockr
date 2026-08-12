@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VolumeLockr</string>
+    <string name="app_name">VolumeLockr PLUS</string>
     <string name="media_title">Contenus multimédias</string>
     <string name="alarm_title">Alarmes</string>
     <string name="notification_title">Sonneries / Notifications</string>
@@ -8,7 +8,7 @@
     <string name="lock">Verrouiller</string>
     <string name="options">Options</string>
     <string name="about">A propos</string>
-    <string name="aboutLibraries_description_text">VolumeLockr</string>
+    <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>
 
     <!-- Preferences -->
     <string name="password_header">Mot de passe</string>

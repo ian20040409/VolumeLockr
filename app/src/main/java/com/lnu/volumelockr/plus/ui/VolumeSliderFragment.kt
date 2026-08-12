@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.ui
+package com.lnu.volumelockr.plus.ui
 
 import android.content.ComponentName
 import android.content.Context
@@ -15,9 +15,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import com.lnu.volumelockr.R
-import com.lnu.volumelockr.databinding.FragmentVolumeSliderBinding
-import com.lnu.volumelockr.service.VolumeService
+import com.lnu.volumelockr.plus.R
+import com.lnu.volumelockr.plus.databinding.FragmentVolumeSliderBinding
+import com.lnu.volumelockr.plus.service.VolumeService
 
 class VolumeSliderFragment : Fragment() {
 
@@ -29,7 +29,7 @@ class VolumeSliderFragment : Fragment() {
 
     private val uiUpdateReceiver = object : android.content.BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "com.lnu.volumelockr.ACTION_UI_UPDATE") {
+            if (intent?.action == "com.lnu.volumelockr.plus.ACTION_UI_UPDATE") {
                 updateQuickActionState()
                 mAdapter?.notifyDataSetChanged()
             }
@@ -50,7 +50,7 @@ class VolumeSliderFragment : Fragment() {
         androidx.core.content.ContextCompat.registerReceiver(
             requireContext(),
             uiUpdateReceiver,
-            android.content.IntentFilter("com.lnu.volumelockr.ACTION_UI_UPDATE"),
+            android.content.IntentFilter("com.lnu.volumelockr.plus.ACTION_UI_UPDATE"),
             androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
         )
         

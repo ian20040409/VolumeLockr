@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.ui
+package com.lnu.volumelockr.plus.ui
 
 import android.content.Context
 import android.os.Bundle
@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.lnu.volumelockr.R
-import com.lnu.volumelockr.databinding.FragmentTvRemoteBinding
+import com.lnu.volumelockr.plus.R
+import com.lnu.volumelockr.plus.databinding.FragmentTvRemoteBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,7 +87,7 @@ class TvRemoteFragment : Fragment() {
         Toast.makeText(context, getString(R.string.toast_connecting_adb, targetIp), Toast.LENGTH_SHORT).show()
         
         scope.launch {
-            val result = com.lnu.volumelockr.adb.AdbController.launchTvApp(requireContext(), targetIp)
+            val result = com.lnu.volumelockr.plus.adb.AdbController.launchTvApp(requireContext(), targetIp)
             
             withContext(Dispatchers.Main) {
                 if (result == "SUCCESS") {
@@ -116,7 +116,7 @@ class TvRemoteFragment : Fragment() {
                     
                     if (code == 200 && endpoint == "hide_icon") {
                         // Use ADB to restart the launcher so the ghost icon is removed immediately
-                        com.lnu.volumelockr.adb.AdbController.forceStopLaunchers(requireContext(), currentIp)
+                        com.lnu.volumelockr.plus.adb.AdbController.forceStopLaunchers(requireContext(), currentIp)
                     }
                 } catch (e: Exception) {
                     // Ignore

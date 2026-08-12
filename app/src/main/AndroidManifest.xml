@@ -76,7 +76,7 @@
             android:exported="true"
             tools:ignore="ExportedReceiver">
             <intent-filter>
-                <action android:name="com.lnu.volumelockr.ACTION_SET_LOCK" />
+                <action android:name="com.lnu.volumelockr.plus.ACTION_SET_LOCK" />
             </intent-filter>
         </receiver>
 

@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">VolumeLockr</string>
-    <string name="title">VolumeLockr</string>
+    <string name="app_name">VolumeLockr PLUS</string>
+    <string name="title">VolumeLockr PLUS</string>
     <string name="lock">Lock</string>
     <string name="options">Options</string>
     <string name="about">About</string>
@@ -25,13 +25,13 @@
     <string name="toast_command_sent">Command sent</string>
     <string name="toast_command_failed">Failed to send command</string>
     <string name="toast_grant_dnd">Please grant Do Not Disturb access to change this volume</string>
-    <string name="toast_autostarted">VolumeLockr started</string>
+    <string name="toast_autostarted">VolumeLockr PLUS started</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">Pair Device (Show IP)</string>
     <string name="pair_with_phone_title">Pair with Phone</string>
-    <string name="pair_with_phone_description">Open the VolumeLockr app on your phone, go to \'TV Remote\', and enter this IP address:</string>
-    <string name="pair_with_phone_message">Open the VolumeLockr app on your phone, go to \'TV Remote\', and enter this IP address:\n\n%1$s</string>
+    <string name="pair_with_phone_description">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address:</string>
+    <string name="pair_with_phone_message">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address:\n\n%1$s</string>
 
     <!-- About Screen Strings -->
     <string name="about_app_description">Simple and powerful volume lock &amp; TV remote tool for Android and Android TV.</string>
@@ -56,7 +56,7 @@
     <string name="limiting_header">Volume Limits</string>
     <string name="allow_lower">Allow lowering volume</string>
     <string name="autostart_on_boot">Autostart on boot</string>
-    <string name="autostart_on_boot_summary">Automatically start VolumeLockr after device restart</string>
+    <string name="autostart_on_boot_summary">Automatically start VolumeLockr PLUS after device restart</string>
 
     <string name="lock_all">Lock all</string>
     <string name="unlock_all">Unlock all</string>
@@ -69,6 +69,6 @@
     <string name="tv_settings_header">TV Settings</string>
     <string name="hide_app_icon_summary">Hide or show the application icon on the Android TV home screen</string>
 
-    <string name="aboutLibraries_description_text">VolumeLockr</string>
+    <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>
     <string name="back">Back</string>
 </resources>

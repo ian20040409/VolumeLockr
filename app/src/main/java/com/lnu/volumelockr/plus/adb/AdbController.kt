@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.adb
+package com.lnu.volumelockr.plus.adb
 
 import android.content.Context
 import com.tananaev.adblib.AdbConnection
@@ -22,7 +22,7 @@ object AdbController {
                 connection = AdbConnection.create(socket, crypto)
                 connection.connect()
                 
-                stream = connection.open("shell:am start -n com.lnu.volumelockr/com.lnu.volumelockr.ui.MainActivity")
+                stream = connection.open("shell:am start -n com.lnu.volumelockr.plus/com.lnu.volumelockr.plus.ui.MainActivity")
                 
                 // Optional: read the response to ensure it executes, but we don't need the exact string
                 try {

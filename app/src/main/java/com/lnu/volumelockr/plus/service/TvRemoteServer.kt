@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.service
+package com.lnu.volumelockr.plus.service
 
 import android.content.Context
 import android.content.Intent
@@ -73,7 +73,7 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
 
                     if (stream != null && locked != null) {
                         val intent = Intent(context, VolumeService::class.java).apply {
-                            action = "com.lnu.volumelockr.ACTION_SET_LOCK"
+                            action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
                             putExtra("stream", stream)
                             putExtra("locked", locked)
                             if (volume != null) {
@@ -103,7 +103,7 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                 }
                 
                 context.packageManager.setComponentEnabledSetting(
-                    android.content.ComponentName(context, "com.lnu.volumelockr.TvLauncherAlias"),
+                    android.content.ComponentName(context, "com.lnu.volumelockr.plus.TvLauncherAlias"),
                     state,
                     android.content.pm.PackageManager.DONT_KILL_APP
                 )
@@ -129,12 +129,12 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                 prefs.edit().putBoolean("hide_tv_unlock_ui", hide).apply()
                 
                 // Broadcast to update UI
-                val intent = Intent("com.lnu.volumelockr.ACTION_UI_UPDATE")
+                val intent = Intent("com.lnu.volumelockr.plus.ACTION_UI_UPDATE")
                 intent.setPackage(context.packageName)
                 context.sendBroadcast(intent)
                 sendResponse(output, 200, "OK")
             } else if (requestLine.startsWith("GET /launch_app")) {
-                val launchIntent = Intent(context, com.lnu.volumelockr.ui.MainActivity::class.java).apply {
+                val launchIntent = Intent(context, com.lnu.volumelockr.plus.ui.MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
                 

@@ -1,11 +1,11 @@
-package com.lnu.volumelockr
+package com.lnu.volumelockr.plus
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import com.lnu.volumelockr.service.VolumeService
+import com.lnu.volumelockr.plus.service.VolumeService
 
 class BootReceiver : BroadcastReceiver() {
 

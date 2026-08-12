@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">VolumeLockr</string>
-    <string name="title">VolumeLockr</string>
+    <string name="app_name">VolumeLockr PLUS</string>
+    <string name="title">VolumeLockr PLUS</string>
     <string name="lock">Bloquear</string>
     <string name="options">Opciones</string>
     <string name="about">Acerca de</string>
@@ -29,6 +29,6 @@
     <string name="password_protected_summary">Requiere una contraseña para cambiar la configuración de bloqueo</string>
     <string name="change_password_summary">Establecer o actualizar la contraseña de desbloqueo</string>
 
-    <string name="aboutLibraries_description_text">VolumeLockr</string>
+    <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>
 
 </resources>

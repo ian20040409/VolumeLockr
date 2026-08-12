@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.ui
+package com.lnu.volumelockr.plus.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -12,9 +12,9 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
-import com.lnu.volumelockr.R
-import com.lnu.volumelockr.databinding.VolumeCardBinding
-import com.lnu.volumelockr.service.VolumeService
+import com.lnu.volumelockr.plus.R
+import com.lnu.volumelockr.plus.databinding.VolumeCardBinding
+import com.lnu.volumelockr.plus.service.VolumeService
 import com.google.android.material.R as MaterialR
 
 class VolumeAdapter(
@@ -151,7 +151,7 @@ class VolumeAdapter(
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         val nm = holder.binding.root.context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                         if (!nm.isNotificationPolicyAccessGranted) {
-                            android.widget.Toast.makeText(holder.binding.root.context, holder.binding.root.context.getString(com.lnu.volumelockr.R.string.toast_grant_dnd), android.widget.Toast.LENGTH_LONG).show()
+                            android.widget.Toast.makeText(holder.binding.root.context, holder.binding.root.context.getString(com.lnu.volumelockr.plus.R.string.toast_grant_dnd), android.widget.Toast.LENGTH_LONG).show()
                             // Snap slider back
                             slider.value = mAudioManager.getStreamVolume(volume.stream).toFloat()
                             // Launch settings

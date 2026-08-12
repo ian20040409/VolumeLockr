@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.ui
+package com.lnu.volumelockr.plus.ui
 
 import android.content.Intent
 import android.net.Uri
@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.lnu.volumelockr.R
-import com.lnu.volumelockr.databinding.ActivityAboutBinding
+import com.lnu.volumelockr.plus.R
+import com.lnu.volumelockr.plus.databinding.ActivityAboutBinding
 import com.mikepenz.aboutlibraries.LibsBuilder
 
 class AboutActivity : AppCompatActivity() {

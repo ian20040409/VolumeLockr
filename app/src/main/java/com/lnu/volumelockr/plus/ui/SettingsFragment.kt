@@ -1,4 +1,4 @@
-package com.lnu.volumelockr.ui
+package com.lnu.volumelockr.plus.ui
 
 import android.content.ComponentName
 import android.content.Context
@@ -18,8 +18,8 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
-import com.lnu.volumelockr.R
-import com.lnu.volumelockr.service.VolumeService
+import com.lnu.volumelockr.plus.R
+import com.lnu.volumelockr.plus.service.VolumeService
 import java.io.IOException
 import java.security.GeneralSecurityException
 

@@ -10,7 +10,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.lnu.volumelockr"
+        applicationId "com.lnu.volumelockr.plus"
         minSdkVersion 21
         targetSdkVersion 37
         versionCode 27
@@ -41,7 +41,7 @@ android {
     lint {
         disable 'MissingTranslation'
     }
-    namespace 'com.lnu.volumelockr'
+    namespace 'com.lnu.volumelockr.plus'
 }
 
 dependencies {

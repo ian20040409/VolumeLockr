@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">VolumeLockr</string>
-    <string name="title">VolumeLockr</string>
+    <string name="app_name">VolumeLockr PLUS</string>
+    <string name="title">VolumeLockr PLUS</string>
     <string name="lock">鎖定</string>
     <string name="options">設定</string>
     <string name="about">關於</string>
@@ -26,13 +26,13 @@
     <string name="toast_command_sent">已傳送指令</string>
     <string name="toast_command_failed">無法傳送指令</string>
     <string name="toast_grant_dnd">請先授權「零打擾」存取權限，才能調整此音量</string>
-    <string name="toast_autostarted">VolumeLockr 已啟動</string>
+    <string name="toast_autostarted">VolumeLockr PLUS 已啟動</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">配對裝置 (顯示 IP)</string>
     <string name="pair_with_phone_title">與手機配對</string>
-    <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr 應用程式，前往「電視遙控器」並輸入此 IP 位址：</string>
-    <string name="pair_with_phone_message">請在手機上開啟 VolumeLockr 應用程式，前往「電視遙控器」並輸入此 IP 位址：\n\n%1$s</string>
+    <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：</string>
+    <string name="pair_with_phone_message">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：\n\n%1$s</string>
 
     <!-- About Screen Strings -->
     <string name="about_app_description">簡約強大的 Android / Android TV 音量鎖定與遠端控制工具。</string>
@@ -68,6 +68,6 @@
     <string name="tv_settings_header">電視設定</string>
     <string name="hide_app_icon_summary">在 Android TV 桌面上隱藏或顯示應用程式圖示</string>
 
-    <string name="aboutLibraries_description_text">VolumeLockr</string>
+    <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>
     <string name="back">返回</string>
 </resources>
