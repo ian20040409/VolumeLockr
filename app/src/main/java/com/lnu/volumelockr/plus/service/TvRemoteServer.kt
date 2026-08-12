@@ -24,7 +24,10 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
         if (job?.isActive == true) return
         job = serviceScope.launch(Dispatchers.IO) {
             try {
-                serverSocket = ServerSocket(8080)
+                serverSocket = ServerSocket().apply {
+                    reuseAddress = true
+                    bind(java.net.InetSocketAddress(8080))
+                }
                 Log.d("TvRemoteServer", "Server started on port 8080")
                 while (isActive) {
                     val client = serverSocket?.accept()
