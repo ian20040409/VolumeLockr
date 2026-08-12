@@ -111,7 +111,8 @@ class VolumeSliderFragment : Fragment() {
         val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
         if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
             binding.tvPairButton.visibility = View.VISIBLE
-            binding.tvPairButton.setOnClickListener { showPairingDialog() }
+            binding.tvPairButton.text = getString(R.string.pair_device_show_ip)
+            binding.tvPairButton.setOnClickListener { startActivity(Intent(requireContext(), PairingActivity::class.java)) }
             binding.systemSoundSettingsButton.visibility = View.GONE
             binding.aboutButton.visibility = View.VISIBLE
         } else {
@@ -131,35 +132,28 @@ class VolumeSliderFragment : Fragment() {
         }
     }
 
-    private fun showPairingDialog() {
-        val ipAddress = getLocalIpAddress() ?: "Unknown"
-        val dialogView = layoutInflater.inflate(R.layout.dialog_pairing, null)
-        dialogView.findViewById<android.widget.TextView>(R.id.ip_address_text)?.text = ipAddress
-
-        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setIcon(R.drawable.devices_other_48px)
-            .setTitle(R.string.pair_with_phone_title)
-            .setView(dialogView)
-            .setPositiveButton(android.R.string.ok, null)
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.requestFocus()
-        }
-
-        dialog.show()
-    }
 
     private fun getLocalIpAddress(): String? {
         try {
-            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()
-            while (interfaces.hasMoreElements()) {
-                val intf = interfaces.nextElement()
-                val addrs = intf.inetAddresses
-                while (addrs.hasMoreElements()) {
-                    val addr = addrs.nextElement()
-                    if (!addr.isLoopbackAddress && addr is java.net.Inet4Address) {
-                        return addr.hostAddress
+            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()?.toList() ?: return null
+            val preferredInterfaces = interfaces.filter { intf ->
+                intf.isUp && !intf.isLoopback && (intf.name.startsWith("wlan") || intf.name.startsWith("eth")) && !intf.name.contains("p2p")
+            }
+            val candidateInterfaces = preferredInterfaces.ifEmpty {
+                interfaces.filter { intf ->
+                    intf.isUp && !intf.isLoopback && !intf.name.contains("p2p") && !intf.name.contains("dummy") && !intf.name.contains("tun")
+                }
+            }.ifEmpty { interfaces }
+
+            for (networkInterface in candidateInterfaces) {
+                val addresses = networkInterface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val address = addresses.nextElement()
+                    if (!address.isLoopbackAddress && address is java.net.Inet4Address) {
+                        val host = address.hostAddress
+                        if (host != null && host != "127.0.0.1") {
+                            return host
+                        }
                     }
                 }
             }

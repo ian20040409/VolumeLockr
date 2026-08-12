@@ -59,24 +59,86 @@ class AboutActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            val libsFragment = LibsBuilder()
-                .supportFragment()
-
-            supportFragmentManager.beginTransaction()
-                .add(R.id.about_libs_container, libsFragment)
-                .commit()
+            binding.root.postDelayed({
+                if (!isDestroyed && !isFinishing) {
+                    val libsFragment = LibsBuilder().supportFragment()
+                    supportFragmentManager.beginTransaction()
+                        .add(R.id.about_libs_container, libsFragment)
+                        .commitAllowingStateLoss()
+                }
+            }, 200)
         }
 
-        binding.root.post {
-            val recyclerView = findRecyclerView(binding.root)
-            recyclerView?.let { rv ->
-                rv.isNestedScrollingEnabled = false
-                val spanCount = if (resources.getBoolean(R.bool.use_two_columns)) 2 else 1
-                if (spanCount > 1) {
-                    rv.layoutManager = GridLayoutManager(this, spanCount)
+        var isLoaded = false
+        fun revealScreen() {
+            if (isLoaded) return
+            isLoaded = true
+
+            binding.loadingIndicator.visibility = View.GONE
+            binding.aboutLibsContainer.visibility = View.VISIBLE
+            android.widget.Toast.makeText(this, R.string.toast_libs_loaded, android.widget.Toast.LENGTH_SHORT).show()
+        }
+
+        val checkRunnable = object : Runnable {
+            override fun run() {
+                if (isLoaded) return
+                val recyclerView = findRecyclerView(binding.root)
+                val adapter = recyclerView?.adapter
+                val itemCount = adapter?.itemCount ?: 0
+
+                // AboutLibraries has multiple items once loaded. Wait for JSON parsing AND render of 3 items.
+                val isFullyLoadedAndRendered = recyclerView != null &&
+                        adapter != null &&
+                        itemCount >= 3 &&
+                        recyclerView.childCount >= 3 &&
+                        (recyclerView.getChildAt(2)?.height ?: 0) > 0
+
+                if (isFullyLoadedAndRendered) {
+                    recyclerView?.let { rv ->
+                        val spanCount = if (resources.getBoolean(R.bool.use_two_columns)) 2 else 1
+                        if (spanCount > 1 && rv.layoutManager !is GridLayoutManager) {
+                            rv.layoutManager = GridLayoutManager(this@AboutActivity, spanCount)
+                        }
+
+                        // Make RecyclerView items focusable for Android TV D-Pad scrolling
+                        if (isTv) {
+                            rv.isFocusable = false
+                            val attachListener = object : RecyclerView.OnChildAttachStateChangeListener {
+                                override fun onChildViewAttachedToWindow(view: View) {
+                                    view.isFocusable = true
+                                    view.isClickable = true
+                                    val typedValue = android.util.TypedValue()
+                                    theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                                    view.setBackgroundResource(typedValue.resourceId)
+                                }
+                                override fun onChildViewDetachedFromWindow(view: View) {}
+                            }
+                            rv.addOnChildAttachStateChangeListener(attachListener)
+                            
+                            // Apply to already attached children
+                            for (i in 0 until rv.childCount) {
+                                attachListener.onChildViewAttachedToWindow(rv.getChildAt(i))
+                            }
+                        }
+                    }
+
+                    // Wait 2 full GPU rendering frames before revealing to eliminate UI freezes
+                    android.view.Choreographer.getInstance().postFrameCallback {
+                        android.view.Choreographer.getInstance().postFrameCallback {
+                            revealScreen()
+                        }
+                    }
+                } else {
+                    binding.root.postDelayed(this, 150)
                 }
             }
         }
+        binding.root.post(checkRunnable)
+
+        val timeoutMs = if (isTv) 12000L else 5000L
+        binding.root.postDelayed({
+            revealScreen()
+        }, timeoutMs)
     }
 
     private fun openUrl(url: String) {

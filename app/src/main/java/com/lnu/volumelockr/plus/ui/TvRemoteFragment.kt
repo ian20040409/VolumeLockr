@@ -12,6 +12,9 @@ import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.FragmentTvRemoteBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
@@ -23,6 +26,8 @@ class TvRemoteFragment : Fragment() {
     private val binding get() = _binding!!
     private val scope = CoroutineScope(Dispatchers.Main)
     private var currentIp: String = ""
+    private var syncJob: Job? = null
+    private var isTrackingTouch = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +50,26 @@ class TvRemoteFragment : Fragment() {
             binding.ipAddressInput.setText(recentIps[0], false)
         }
 
+        binding.scanQrButton.setOnClickListener {
+            val options = com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions.Builder()
+                .setBarcodeFormats(com.google.mlkit.vision.barcode.common.Barcode.FORMAT_QR_CODE)
+                .build()
+            val scanner = com.google.mlkit.vision.codescanner.GmsBarcodeScanning.getClient(requireContext(), options)
+            scanner.startScan()
+                .addOnSuccessListener { barcode ->
+                    barcode.rawValue?.let { scannedRaw ->
+                        val ipRegex = Regex("""\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b""")
+                        val cleanIp = ipRegex.find(scannedRaw)?.value ?: scannedRaw.trim()
+                        binding.ipAddressInput.setText(cleanIp, false)
+                        currentIp = cleanIp
+                        testConnection()
+                    }
+                }
+                .addOnFailureListener {
+                    // Ignore or show error
+                }
+        }
+
         binding.connectButton.setOnClickListener {
             val ip = binding.ipAddressInput.text.toString().trim()
             if (ip.isNotEmpty()) {
@@ -56,11 +81,11 @@ class TvRemoteFragment : Fragment() {
         }
 
         binding.hideIconSwitch.setOnCheckedChangeListener { _, isChecked ->
-            sendConfigCommand("hide_icon", isChecked)
+            sendConfigCommand("hide_icon", isChecked, true)
         }
 
         binding.hideUnlockSwitch.setOnCheckedChangeListener { _, isChecked ->
-            sendConfigCommand("hide_unlock", isChecked)
+            sendConfigCommand("hide_unlock", isChecked, false)
         }
 
         binding.volumeSlider.addOnChangeListener { _, value, fromUser ->
@@ -68,6 +93,15 @@ class TvRemoteFragment : Fragment() {
                 sendVolumeCommand(value.toInt())
             }
         }
+        
+        binding.volumeSlider.addOnSliderTouchListener(object : com.google.android.material.slider.Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                isTrackingTouch = true
+            }
+            override fun onStopTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                isTrackingTouch = false
+            }
+        })
 
         binding.lockButton.setOnClickListener {
             val volume = binding.volumeSlider.value.toInt()
@@ -107,7 +141,7 @@ class TvRemoteFragment : Fragment() {
         }
     }
 
-    private fun sendConfigCommand(endpoint: String, hide: Boolean) {
+    private fun sendConfigCommand(endpoint: String, hide: Boolean, useAdbRestart: Boolean) {
         if (currentIp.isEmpty()) return
         scope.launch {
             withContext(Dispatchers.IO) {
@@ -120,7 +154,7 @@ class TvRemoteFragment : Fragment() {
                     val code = connection.responseCode
                     connection.disconnect()
                     
-                    if (code == 200 && endpoint == "hide_icon") {
+                    if (code == 200 && endpoint == "hide_icon" && useAdbRestart) {
                         // Use ADB to restart the launcher so the ghost icon is removed immediately
                         com.lnu.volumelockr.plus.adb.AdbController.forceStopLaunchers(requireContext(), currentIp)
                     }
@@ -131,9 +165,13 @@ class TvRemoteFragment : Fragment() {
         }
     }
 
+    private var volumeJob: Job? = null
+
     private fun sendVolumeCommand(volume: Int) {
         if (currentIp.isEmpty()) return
-        scope.launch {
+        volumeJob?.cancel()
+        volumeJob = scope.launch {
+            delay(100) // Debounce for smooth dragging
             withContext(Dispatchers.IO) {
                 try {
                     val url = URL("http://$currentIp:8080/set_volume?stream=3&volume=$volume")
@@ -186,8 +224,22 @@ class TvRemoteFragment : Fragment() {
                     binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
                 }
                 
-                sendConfigCommand("hide_icon", binding.hideIconSwitch.isChecked)
-                sendConfigCommand("hide_unlock", binding.hideUnlockSwitch.isChecked)
+                if (parts.size >= 5) {
+                    binding.hideIconSwitch.setOnCheckedChangeListener(null)
+                    binding.hideUnlockSwitch.setOnCheckedChangeListener(null)
+                    
+                    binding.hideIconSwitch.isChecked = parts[3].toBoolean()
+                    binding.hideUnlockSwitch.isChecked = parts[4].toBoolean()
+                    
+                    binding.hideIconSwitch.setOnCheckedChangeListener { _, isChecked ->
+                        sendConfigCommand("hide_icon", isChecked, true)
+                    }
+                    binding.hideUnlockSwitch.setOnCheckedChangeListener { _, isChecked ->
+                        sendConfigCommand("hide_unlock", isChecked, false)
+                    }
+                }
+                
+                startVolumeSync()
                 
                 // Save to recent IPs
                 val prefs = requireContext().getSharedPreferences("tv_remote", Context.MODE_PRIVATE)
@@ -203,6 +255,7 @@ class TvRemoteFragment : Fragment() {
             } else {
                 Toast.makeText(context, R.string.toast_connection_failed, Toast.LENGTH_SHORT).show()
                 binding.controlCard.visibility = View.GONE
+                syncJob?.cancel()
             }
         }
     }
@@ -210,6 +263,42 @@ class TvRemoteFragment : Fragment() {
     private fun setupIpAdapter(ips: List<String>) {
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, ips)
         binding.ipAddressInput.setAdapter(adapter)
+    }
+
+    private fun startVolumeSync() {
+        syncJob?.cancel()
+        syncJob = scope.launch {
+            while (isActive) {
+                delay(1000)
+                if (currentIp.isNotEmpty() && binding.controlCard.visibility == View.VISIBLE) {
+                    val pingResult = withContext(Dispatchers.IO) {
+                        try {
+                            val url = URL("http://$currentIp:8080/ping")
+                            val connection = url.openConnection() as HttpURLConnection
+                            connection.connectTimeout = 3000
+                            connection.readTimeout = 3000
+                            connection.requestMethod = "GET"
+                            if (connection.responseCode == 200) {
+                                connection.inputStream.bufferedReader().use { it.readText() }
+                            } else null
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    if (pingResult != null && pingResult.startsWith("OK")) {
+                        val parts = pingResult.split(",")
+                        if (parts.size >= 3) {
+                            val maxVol = parts[1].toFloatOrNull() ?: 15f
+                            val currVol = parts[2].toFloatOrNull() ?: 0f
+                            if (!isTrackingTouch) {
+                                binding.volumeSlider.valueTo = maxVol
+                                binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun sendLockCommand(volume: Int, locked: Boolean) {
@@ -240,6 +329,7 @@ class TvRemoteFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        syncJob?.cancel()
         _binding = null
     }
 }

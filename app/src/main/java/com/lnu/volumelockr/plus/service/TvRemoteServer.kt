@@ -62,7 +62,17 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                 val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                 val maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 val currentVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
-                sendResponse(output, 200, "OK,$maxVolume,$currentVolume")
+                
+                // Check if icon is hidden
+                val componentName = android.content.ComponentName(context, "com.lnu.volumelockr.plus.TvLauncherAlias")
+                val state = context.packageManager.getComponentEnabledSetting(componentName)
+                val hideIcon = state == android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                
+                // Check if unlock is hidden
+                val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+                val hideUnlock = prefs.getBoolean("hide_tv_unlock_ui", true)
+                
+                sendResponse(output, 200, "OK,$maxVolume,$currentVolume,$hideIcon,$hideUnlock")
             } else if (requestLine.startsWith("GET /set_lock")) {
                 val parts = requestLine.split(" ")
                 if (parts.size >= 2) {
@@ -107,6 +117,19 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                         try {
                             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                             am.setStreamVolume(stream, volume, 0)
+
+                            val intent = Intent(context, VolumeService::class.java).apply {
+                                action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
+                                putExtra("stream", stream)
+                                putExtra("volume", volume)
+                                putExtra("update_if_locked_only", true)
+                            }
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                context.startForegroundService(intent)
+                            } else {
+                                context.startService(intent)
+                            }
+
                             sendResponse(output, 200, "OK")
                         } catch (e: Exception) {
                             sendResponse(output, 500, "Internal Server Error")

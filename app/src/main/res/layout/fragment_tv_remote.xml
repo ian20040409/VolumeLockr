@@ -32,6 +32,7 @@
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ip_address_input_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -44,6 +45,16 @@
                     android:layout_height="wrap_content"
                     android:inputType="textUri" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/scan_qr_button"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Scan QR Code"
+                app:icon="@drawable/ic_qr_code_scanner"
+                app:iconGravity="textStart" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/hide_icon_switch"

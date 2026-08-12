@@ -28,7 +28,7 @@
     <string name="toast_autostarted">VolumeLockr PLUS started</string>
 
     <!-- Pairing Dialog Strings -->
-    <string name="pair_device_show_ip">Pair Device (Show IP)</string>
+    <string name="pair_device_show_ip">Pair Device</string>
     <string name="pair_with_phone_title">Pair with Phone</string>
     <string name="pair_with_phone_description">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address:</string>
     <string name="pair_with_phone_message">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address:\n\n%1$s</string>
@@ -38,6 +38,7 @@
     <string name="github_repo_ian">GitHub Repository</string>
     <string name="github_repo_original">Original Project (jonathanklee)</string>
     <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="toast_libs_loaded">Third-party open source licenses loaded</string>
 
     <string name="media_title">Media</string>
     <string name="alarm_title">Alarm</string>

@@ -53,14 +53,21 @@ class VolumeService : Service() {
 
         const val MODE_RINGER_SETTING = "mode_ringer"
 
-        const val PERIOD_IN_MS = 25L
+        const val PERIOD_IN_MS = 1000L
 
         fun start(context: Context) {
             val service = Intent(context, VolumeService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(service)
-            } else {
-                context.startService(service)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(service)
+                } else {
+                    context.startService(service)
+                }
+            } catch (e: Exception) {
+                try {
+                    context.startService(service)
+                } catch (ignored: Exception) {
+                }
             }
         }
     }
@@ -74,7 +81,7 @@ class VolumeService : Service() {
     private var mVolumeLock = HashMap<Int, Int>()
 
     private var mTimer: Timer? = null
-    private var mAllowLower = false
+    private var mAllowLower = true
     private var mAllowLowerListener: (() -> Unit)? = null
     
     private var mTvRemoteServer: TvRemoteServer? = null
@@ -116,28 +123,45 @@ class VolumeService : Service() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         mAllowLower = sharedPreferences.getBoolean(ALLOW_LOWER_PREFERENCE, true)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            tryShowNotification()
+        }
+
 
 
         if (intent?.action == "com.lnu.volumelockr.plus.ACTION_SET_LOCK") {
             val stream = intent.getIntExtra("stream", -1)
             if (stream != -1) {
-                val locked = intent.getBooleanExtra("locked", true)
-                if (locked) {
-                    val volume = intent.getIntExtra("volume", -1)
-                    if (volume != -1) {
-                        try {
-                            mAudioManager.setStreamVolume(stream, volume, 0)
-                        } catch (e: SecurityException) {
-                        }
-                        addLock(stream, volume)
-                        if (mTimer == null) {
-                            startLocking()
+                val updateIfLockedOnly = intent.getBooleanExtra("update_if_locked_only", false)
+                if (updateIfLockedOnly) {
+                    if (mVolumeLock.containsKey(stream)) {
+                        val volume = intent.getIntExtra("volume", -1)
+                        if (volume != -1) {
+                            try {
+                                mAudioManager.setStreamVolume(stream, volume, 0)
+                            } catch (_: SecurityException) {}
+                            addLock(stream, volume)
                         }
                     }
                 } else {
-                    removeLock(stream)
-                    if (mVolumeLock.isEmpty()) {
-                        stopLocking()
+                    val locked = intent.getBooleanExtra("locked", true)
+                    if (locked) {
+                        val volume = intent.getIntExtra("volume", -1)
+                        if (volume != -1) {
+                            try {
+                                mAudioManager.setStreamVolume(stream, volume, 0)
+                            } catch (e: SecurityException) {
+                            }
+                            addLock(stream, volume)
+                            if (mTimer == null) {
+                                startLocking()
+                            }
+                        }
+                    } else {
+                        removeLock(stream)
+                        if (mVolumeLock.isEmpty()) {
+                            stopLocking()
+                        }
                     }
                 }
                 invokeVolumeListenerCallback()
@@ -219,9 +243,10 @@ class VolumeService : Service() {
     }
 
     private fun loadPreferences() {
-        val sharedPreferences = getSharedPreferences(APP_SHARED_PREFERENCES, MODE_PRIVATE)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        mAllowLower = sharedPreferences.getBoolean(ALLOW_LOWER_PREFERENCE, true)
         class Token : TypeToken<HashMap<Int, Int>>()
-        val value = sharedPreferences.getString(LOCKS_KEY, "")
+        val value = getSharedPreferences(APP_SHARED_PREFERENCES, MODE_PRIVATE).getString(LOCKS_KEY, "")
         if (value.isNullOrBlank()) {
             return
         }
@@ -245,9 +270,21 @@ class VolumeService : Service() {
         }
     }
 
+    private val checkVolumeHandler = Handler(Looper.getMainLooper())
+    private val checkVolumeRunnable = Runnable {
+        checkVolumes()
+    }
+
     private val mVolumeObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
         override fun onChange(selfChange: Boolean) {
             super.onChange(selfChange)
+            checkVolumeHandler.removeCallbacks(checkVolumeRunnable)
+            if (isTvMode()) {
+                // 300ms debounce prevents race condition on TCL TV firmware volume UI
+                checkVolumeHandler.postDelayed(checkVolumeRunnable, 300)
+            } else {
+                checkVolumes()
+            }
             invokeVolumeListenerCallback()
         }
     }

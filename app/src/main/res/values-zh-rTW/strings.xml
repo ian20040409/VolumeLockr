@@ -29,7 +29,7 @@
     <string name="toast_autostarted">VolumeLockr PLUS 已啟動</string>
 
     <!-- Pairing Dialog Strings -->
-    <string name="pair_device_show_ip">配對裝置 (顯示 IP)</string>
+    <string name="pair_device_show_ip">與手機配對</string>
     <string name="pair_with_phone_title">與手機配對</string>
     <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：</string>
     <string name="pair_with_phone_message">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：\n\n%1$s</string>
@@ -39,6 +39,7 @@
     <string name="github_repo_ian">GitHub 專案庫</string>
     <string name="github_repo_original">原創專案庫 (jonathanklee)</string>
     <string name="open_source_licenses">第三方開源授權</string>
+    <string name="toast_libs_loaded">第三方授權庫載入完成</string>
 
     <string name="media_title">媒體</string>
     <string name="alarm_title">鬧鐘</string>

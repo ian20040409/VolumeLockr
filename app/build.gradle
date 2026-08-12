@@ -13,8 +13,8 @@ android {
         applicationId "com.lnu.volumelockr.plus"
         minSdkVersion 21
         targetSdkVersion 37
-        versionCode 29
-        versionName "2.5.b"
+        versionCode 30
+        versionName "2.6"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -60,6 +60,7 @@ dependencies {
     implementation libs.security.crypto
     implementation 'androidx.browser:browser:1.8.0'
     implementation libs.zxing.core
+    implementation libs.play.services.code.scanner
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
