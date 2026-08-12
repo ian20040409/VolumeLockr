@@ -93,6 +93,28 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                         sendResponse(output, 400, "Bad Request")
                     }
                 }
+            } else if (requestLine.startsWith("GET /set_volume")) {
+                val parts = requestLine.split(" ")
+                if (parts.size >= 2) {
+                    val pathAndQuery = parts[1]
+                    val query = pathAndQuery.substringAfter("?", "")
+                    val params = parseQuery(query)
+
+                    val stream = params["stream"]?.toIntOrNull()
+                    val volume = params["volume"]?.toIntOrNull()
+
+                    if (stream != null && volume != null) {
+                        try {
+                            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                            am.setStreamVolume(stream, volume, 0)
+                            sendResponse(output, 200, "OK")
+                        } catch (e: Exception) {
+                            sendResponse(output, 500, "Internal Server Error")
+                        }
+                    } else {
+                        sendResponse(output, 400, "Bad Request")
+                    }
+                }
             } else if (requestLine.startsWith("GET /hide_icon")) {
                 val parts = requestLine.split(" ")
                 val query = parts[1].substringAfter("?", "")

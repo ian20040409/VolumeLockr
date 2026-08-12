@@ -125,6 +125,10 @@ class VolumeService : Service() {
                 if (locked) {
                     val volume = intent.getIntExtra("volume", -1)
                     if (volume != -1) {
+                        try {
+                            mAudioManager.setStreamVolume(stream, volume, 0)
+                        } catch (e: SecurityException) {
+                        }
                         addLock(stream, volume)
                         if (mTimer == null) {
                             startLocking()

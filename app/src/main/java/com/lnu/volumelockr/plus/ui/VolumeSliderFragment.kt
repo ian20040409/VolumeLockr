@@ -137,7 +137,7 @@ class VolumeSliderFragment : Fragment() {
         dialogView.findViewById<android.widget.TextView>(R.id.ip_address_text)?.text = ipAddress
 
         val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setIcon(R.drawable.host_48px)
+            .setIcon(R.drawable.devices_other_48px)
             .setTitle(R.string.pair_with_phone_title)
             .setView(dialogView)
             .setPositiveButton(android.R.string.ok, null)

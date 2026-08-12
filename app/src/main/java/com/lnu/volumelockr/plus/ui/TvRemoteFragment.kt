@@ -63,6 +63,12 @@ class TvRemoteFragment : Fragment() {
             sendConfigCommand("hide_unlock", isChecked)
         }
 
+        binding.volumeSlider.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                sendVolumeCommand(value.toInt())
+            }
+        }
+
         binding.lockButton.setOnClickListener {
             val volume = binding.volumeSlider.value.toInt()
             sendLockCommand(volume, true)
@@ -118,6 +124,25 @@ class TvRemoteFragment : Fragment() {
                         // Use ADB to restart the launcher so the ghost icon is removed immediately
                         com.lnu.volumelockr.plus.adb.AdbController.forceStopLaunchers(requireContext(), currentIp)
                     }
+                } catch (e: Exception) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+    private fun sendVolumeCommand(volume: Int) {
+        if (currentIp.isEmpty()) return
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val url = URL("http://$currentIp:8080/set_volume?stream=3&volume=$volume")
+                    val connection = url.openConnection() as HttpURLConnection
+                    connection.connectTimeout = 3000
+                    connection.readTimeout = 3000
+                    connection.requestMethod = "GET"
+                    connection.responseCode
+                    connection.disconnect()
                 } catch (e: Exception) {
                     // Ignore
                 }

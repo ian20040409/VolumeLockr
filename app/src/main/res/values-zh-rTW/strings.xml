@@ -70,4 +70,7 @@
 
     <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>
     <string name="back">返回</string>
+
+    <string name="autostart_on_boot">開機自動啟動</string>
+    <string name="autostart_on_boot_summary">裝置重新啟動後自動啟動 VolumeLockr PLUS</string>
 </resources>
