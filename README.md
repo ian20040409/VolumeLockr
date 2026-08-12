@@ -26,13 +26,13 @@ This modified work is released under the same **GNU General Public License v3.0*
 ### 1. Get the Sources
 
 ```bash
-git clone git@github.com:ian20040409/VolumeLockr.git
+git clone git@github.com:ian20040409/VolumeLockr-PLUS.git
 ```
 
 ### 2. Build
 
 ```bash
-cd VolumeLockr
+cd VolumeLockr-PLUS
 ./gradlew assembleDebug
 ```
 

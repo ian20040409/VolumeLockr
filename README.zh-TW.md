@@ -26,13 +26,13 @@ VolumeLockr PLUS 是一款用於控制 Android 裝置音量並為各個音量頻
 ### 1. 取得原始碼
 
 ```bash
-git clone git@github.com:ian20040409/VolumeLockr.git
+git clone git@github.com:ian20040409/VolumeLockr-PLUS.git
 ```
 
 ### 2. 編譯 APK
 
 ```bash
-cd VolumeLockr
+cd VolumeLockr-PLUS
 ./gradlew assembleDebug
 ```
 

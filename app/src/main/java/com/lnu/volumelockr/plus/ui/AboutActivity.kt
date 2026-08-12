@@ -51,7 +51,7 @@ class AboutActivity : AppCompatActivity() {
         }
 
         binding.btnGithubIan.setOnClickListener {
-            openUrl("https://github.com/ian20040409/VolumeLockr")
+            openUrl("https://github.com/ian20040409/VolumeLockr-PLUS")
         }
 
         binding.btnGithubOriginal.setOnClickListener {
