@@ -35,7 +35,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="12dp"
-                android:src="@drawable/host_48px"
+                android:src="@drawable/settings_ethernet_48px"
                 app:tint="?attr/colorPrimary" />
 
             <TextView
