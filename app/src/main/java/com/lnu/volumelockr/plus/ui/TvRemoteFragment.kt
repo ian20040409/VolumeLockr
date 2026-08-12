@@ -89,8 +89,19 @@ class TvRemoteFragment : Fragment() {
         }
 
         binding.volumeSlider.addOnChangeListener { _, value, fromUser ->
+            binding.volumeValueText.text = "${value.toInt()} / ${binding.volumeSlider.valueTo.toInt()}"
             if (fromUser) {
                 sendVolumeCommand(value.toInt())
+            }
+        }
+        
+        binding.volumeValueText.setOnClickListener {
+            val min = binding.volumeSlider.valueFrom.toInt()
+            val max = binding.volumeSlider.valueTo.toInt()
+            val current = binding.volumeSlider.value.toInt()
+            showDirectVolumeInputDialog(min, max, current) { clamped ->
+                binding.volumeSlider.value = clamped.toFloat()
+                sendVolumeCommand(clamped)
             }
         }
         
@@ -222,6 +233,7 @@ class TvRemoteFragment : Fragment() {
                     val currVol = parts[2].toFloatOrNull() ?: 0f
                     binding.volumeSlider.valueTo = maxVol
                     binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
+                    binding.volumeValueText.text = "${binding.volumeSlider.value.toInt()} / ${maxVol.toInt()}"
                 }
                 
                 if (parts.size >= 5) {
@@ -293,12 +305,41 @@ class TvRemoteFragment : Fragment() {
                             if (!isTrackingTouch) {
                                 binding.volumeSlider.valueTo = maxVol
                                 binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
+                                binding.volumeValueText.text = "${binding.volumeSlider.value.toInt()} / ${maxVol.toInt()}"
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun showDirectVolumeInputDialog(min: Int, max: Int, current: Int, onConfirm: (Int) -> Unit) {
+        val context = requireContext()
+        val input = com.google.android.material.textfield.TextInputEditText(context).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText(current.toString())
+            setSelection(text?.length ?: 0)
+        }
+        val container = android.widget.FrameLayout(context).apply {
+            val padding = (24 * context.resources.displayMetrics.density).toInt()
+            setPadding(padding, padding / 2, padding, 0)
+            addView(input)
+        }
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(context.getString(R.string.set_custom_volume))
+            .setMessage(context.getString(R.string.enter_volume_value, min, max))
+            .setView(container)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val entered = input.text.toString().toIntOrNull()
+                if (entered != null) {
+                    val clamped = entered.coerceIn(min, max)
+                    onConfirm(clamped)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun sendLockCommand(volume: Int, locked: Boolean) {

@@ -1,7 +1,5 @@
 package com.lnu.volumelockr.plus.ui
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -10,10 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.lnu.volumelockr.plus.R
-import com.lnu.volumelockr.plus.databinding.ActivityAboutBinding
+import com.lnu.volumelockr.plus.databinding.ActivityLicensesBinding
+import com.mikepenz.aboutlibraries.LibsBuilder
 
-class AboutActivity : AppCompatActivity() {
+class LicensesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,40 +25,58 @@ class AboutActivity : AppCompatActivity() {
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        val binding = ActivityAboutBinding.inflate(layoutInflater)
+        val binding = ActivityLicensesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
         val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
         val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
-        supportActionBar?.title = getString(R.string.about)
-        
+        supportActionBar?.title = getString(R.string.open_source_licenses)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        if (savedInstanceState == null) {
+            val libsFragment = LibsBuilder().supportFragment()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.about_libs_container, libsFragment)
+                .commitAllowingStateLoss()
+        }
+
         if (isTv) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(false)
-            binding.btnBackTv.visibility = View.VISIBLE
-            binding.btnBackTv.setOnClickListener { finish() }
-        } else {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            val checkRunnable = object : Runnable {
+                override fun run() {
+                    if (isDestroyed || isFinishing) return
+                    val recyclerView = findRecyclerView(binding.root)
+                    val adapter = recyclerView?.adapter
+                    
+                    if (recyclerView != null && adapter != null && recyclerView.childCount > 0) {
+                        recyclerView.isFocusable = false
+                        val attachListener = object : RecyclerView.OnChildAttachStateChangeListener {
+                            override fun onChildViewAttachedToWindow(view: View) {
+                                view.isFocusable = true
+                                view.isClickable = true
+                            }
+                            override fun onChildViewDetachedFromWindow(view: View) {}
+                        }
+                        recyclerView.addOnChildAttachStateChangeListener(attachListener)
+                        
+                        for (i in 0 until recyclerView.childCount) {
+                            attachListener.onChildViewAttachedToWindow(recyclerView.getChildAt(i))
+                        }
+                    } else {
+                        binding.root.postDelayed(this, 150)
+                    }
+                }
+            }
+            binding.root.post(checkRunnable)
         }
+    }
 
-        try {
-            val pInfo = packageManager.getPackageInfo(packageName, 0)
-            binding.versionName.text = "v${pInfo.versionName}"
-        } catch (e: Exception) {
-            binding.versionName.visibility = View.GONE
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
         }
-
-        binding.btnGithubIan.setOnClickListener {
-            openUrl("https://github.com/ian20040409/VolumeLockr-PLUS")
-        }
-
-        binding.btnGithubOriginal.setOnClickListener {
-            openUrl("https://github.com/jonathanklee/VolumeLockr")
-        }
-
-        binding.btnLicenses.setOnClickListener {
-            startActivity(Intent(this, LicensesActivity::class.java))
-        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun openUrl(url: String) {
@@ -73,11 +92,10 @@ class AboutActivity : AppCompatActivity() {
             val customTabsIntent = androidx.browser.customtabs.CustomTabsIntent.Builder()
                 .setShowTitle(true)
                 .build()
-            customTabsIntent.launchUrl(this, Uri.parse(url))
+            customTabsIntent.launchUrl(this, android.net.Uri.parse(url))
         }.onFailure {
-            // Fallback to standard intent if custom tabs fail
             runCatching {
-                super.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                super.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
             }.onFailure {
                 showQrCodeDialog(url)
             }
@@ -114,22 +132,14 @@ class AboutActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun startActivity(intent: Intent?) {
+    override fun startActivity(intent: android.content.Intent?) {
         startActivity(intent, null)
     }
 
     private var isOpeningUrl = false
 
-    override fun startActivity(intent: Intent?, options: Bundle?) {
-        if (!isOpeningUrl && intent?.action == Intent.ACTION_VIEW) {
+    override fun startActivity(intent: android.content.Intent?, options: Bundle?) {
+        if (!isOpeningUrl && intent?.action == android.content.Intent.ACTION_VIEW) {
             val url = intent.dataString
             if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
                 isOpeningUrl = true
@@ -144,4 +154,15 @@ class AboutActivity : AppCompatActivity() {
         super.startActivity(intent, options)
     }
 
+    private fun findRecyclerView(view: View): RecyclerView? {
+        if (view is RecyclerView) return view
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                val child = view.getChildAt(i)
+                val rv = findRecyclerView(child)
+                if (rv != null) return rv
+            }
+        }
+        return null
+    }
 }

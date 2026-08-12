@@ -83,6 +83,12 @@ class VolumeAdapter(
         holder.binding.slider.valueTo = volume.max.toFloat()
         holder.binding.volumeValue.text = formatVolumeValue(holder.binding.slider.value.toInt(), volume.max)
 
+        holder.binding.volumeValue.setOnClickListener {
+            if (!isPasswordProtected()) {
+                showDirectVolumeInputDialog(holder, volume)
+            }
+        }
+
         registerSeekBarCallback(holder, volume)
         registerLockButtonCallback(holder, volume)
 
@@ -255,6 +261,56 @@ class VolumeAdapter(
             applyLockedState(holder, volume, false)
             onLockStateChanged?.invoke()
         }
+    }
+
+    private fun showDirectVolumeInputDialog(holder: ViewHolder, volume: Volume) {
+        val context = holder.binding.root.context
+        val min = volume.min
+        val max = volume.max
+        val current = holder.binding.slider.value.toInt()
+
+        val input = com.google.android.material.textfield.TextInputEditText(context).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText(current.toString())
+            setSelection(text?.length ?: 0)
+        }
+        val container = android.widget.FrameLayout(context).apply {
+            val padding = (24 * context.resources.displayMetrics.density).toInt()
+            setPadding(padding, padding / 2, padding, 0)
+            addView(input)
+        }
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(context.getString(R.string.set_custom_volume))
+            .setMessage(context.getString(R.string.enter_volume_value, min, max))
+            .setView(container)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val entered = input.text.toString().toIntOrNull()
+                if (entered != null) {
+                    val clamped = entered.coerceIn(min, max)
+                    if (volume.stream == AudioManager.STREAM_RING || volume.stream == AudioManager.STREAM_NOTIFICATION) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                            if (!nm.isNotificationPolicyAccessGranted) {
+                                android.widget.Toast.makeText(context, context.getString(R.string.toast_grant_dnd), android.widget.Toast.LENGTH_LONG).show()
+                                return@setPositiveButton
+                            }
+                        }
+                    }
+
+                    try {
+                        mAudioManager.setStreamVolume(volume.stream, clamped, 0)
+                    } catch (e: SecurityException) {
+                        // Ignore
+                    }
+
+                    volume.value = clamped
+                    holder.binding.slider.value = clamped.toFloat()
+                    holder.binding.volumeValue.text = formatVolumeValue(clamped, volume.max)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun isPasswordProtected(): Boolean {
