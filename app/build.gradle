@@ -13,8 +13,8 @@ android {
         applicationId "com.lnu.volumelockr.plus"
         minSdkVersion 21
         targetSdkVersion 37
-        versionCode 28
-        versionName "2.5.a"
+        versionCode 29
+        versionName "2.5.b"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
