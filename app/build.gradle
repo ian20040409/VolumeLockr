@@ -7,7 +7,6 @@ plugins {
 
 android {
     compileSdk 37
-    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.lnu.volumelockr.plus"
@@ -37,6 +36,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
     lint {
         disable 'MissingTranslation'

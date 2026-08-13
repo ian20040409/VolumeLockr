@@ -33,7 +33,7 @@ class TvRemoteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val contextThemeWrapper = android.view.ContextThemeWrapper(requireContext(), com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar)
+        val contextThemeWrapper = android.view.ContextThemeWrapper(requireContext(), R.style.ThemeOverlay_App_RoyalPurple)
         val localInflater = inflater.cloneInContext(contextThemeWrapper)
         _binding = FragmentTvRemoteBinding.inflate(localInflater, container, false)
         return binding.root

@@ -35,6 +35,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var isDndDialogShowing = false
+    private var activeDndDialog: androidx.appcompat.app.AlertDialog? = null
+
+    override fun onPause() {
+        super.onPause()
+        binding.toolbar.dismissPopupMenus()
+    }
+
+    override fun onDestroy() {
+        binding.toolbar.dismissPopupMenus()
+        activeDndDialog?.dismiss()
+        activeDndDialog = null
+        themeAnimator?.cancel()
+        themeAnimator = null
+        super.onDestroy()
+    }
 
     private fun checkPermissions() {
         val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
@@ -44,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         if (!isTv && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted) {
             if (!isDndDialogShowing) {
                 isDndDialogShowing = true
-                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                activeDndDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle("需要勿擾模式權限")
                     .setMessage("請授予勿擾模式(DND)權限，否則將無法調整與鎖定鈴聲音量。")
                     .setPositiveButton("前往設定") { _, _ ->
@@ -209,9 +224,10 @@ class MainActivity : AppCompatActivity() {
 
     private var themeAnimator: android.animation.ValueAnimator? = null
 
+    @Suppress("DEPRECATION")
     private fun applyThemeColors(isTvRemote: Boolean) {
         val themeContext = if (isTvRemote) {
-            android.view.ContextThemeWrapper(this, com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar)
+            android.view.ContextThemeWrapper(this, R.style.ThemeOverlay_App_RoyalPurple)
         } else {
             this
         }
@@ -257,7 +273,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val initialSurface = window.statusBarColor
+        val initialSurface = (binding.root.background as? android.graphics.drawable.ColorDrawable)?.color ?: window.statusBarColor
         val initialBottomNavBg = window.navigationBarColor
 
         themeAnimator?.cancel()
@@ -269,6 +285,9 @@ class MainActivity : AppCompatActivity() {
                 val currentSurface = argbEvaluator.evaluate(fraction, initialSurface, targetSurface) as Int
                 val currentBottomNavBg = argbEvaluator.evaluate(fraction, initialBottomNavBg, targetBottomNavBg) as Int
 
+                binding.root.setBackgroundColor(currentSurface)
+                binding.fragmentContainerView.setBackgroundColor(currentSurface)
+                window.decorView.setBackgroundColor(currentSurface)
                 binding.appBarLayout.setBackgroundColor(currentSurface)
                 binding.toolbar.setBackgroundColor(currentSurface)
                 window.statusBarColor = currentSurface

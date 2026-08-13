@@ -17,4 +17,14 @@
     <color name="ring_color_on_container">#9E6900</color>
     <color name="black_dnd_container">#616161</color>
     <color name="black_dnd_on_container">#FFFFFF</color>
+
+    <!-- Royal Purple Theme (#2e0175) -->
+    <color name="royal_purple_primary">#2E0175</color>
+    <color name="royal_purple_on_primary">#FFFFFF</color>
+    <color name="royal_purple_primary_container">#E8DDFF</color>
+    <color name="royal_purple_on_primary_container">#250060</color>
+    <color name="royal_purple_secondary_container">#E8DEF8</color>
+    <color name="royal_purple_on_secondary_container">#2E0175</color>
+    <color name="royal_purple_surface">#FAF7FD</color>
+    <color name="royal_purple_surface_container">#F3EDF8</color>
 </resources>

@@ -14,4 +14,15 @@
     <style name="PreferenceMaterialSwitch" parent="@style/Preference.SwitchPreferenceCompat.Material">
         <item name="widgetLayout">@layout/preference_switch</item>
     </style>
+
+    <style name="ThemeOverlay.App.RoyalPurple" parent="ThemeOverlay.Material3">
+        <item name="colorPrimary">@color/royal_purple_primary</item>
+        <item name="colorOnPrimary">@color/royal_purple_on_primary</item>
+        <item name="colorPrimaryContainer">@color/royal_purple_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/royal_purple_on_primary_container</item>
+        <item name="colorSecondaryContainer">@color/royal_purple_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/royal_purple_on_secondary_container</item>
+        <item name="colorSurface">@color/royal_purple_surface</item>
+        <item name="colorSurfaceContainer">@color/royal_purple_surface_container</item>
+    </style>
 </resources>
