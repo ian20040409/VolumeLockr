@@ -15,7 +15,7 @@
     <color name="media_color_on_container">#312E81</color>
     <color name="ring_color_container">#FFF5D1</color>
     <color name="ring_color_on_container">#9E6900</color>
-    <color name="black_dnd_container">#616161</color>
+    <color name="black_dnd_container">#000000</color>
     <color name="black_dnd_on_container">#FFFFFF</color>
 
     <!-- Royal Purple Theme (#2e0175) -->

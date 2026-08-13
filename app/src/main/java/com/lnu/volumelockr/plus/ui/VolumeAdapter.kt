@@ -141,31 +141,40 @@ class VolumeAdapter(
         if (!hasDndAccess && (stream == AudioManager.STREAM_RING || stream == AudioManager.STREAM_NOTIFICATION)) {
             containerColor = ContextCompat.getColor(mContext, R.color.black_dnd_container)
             onContainerColor = ContextCompat.getColor(mContext, R.color.black_dnd_on_container)
-        } else if (isLocked) {
-            containerColor = ContextCompat.getColor(mContext, R.color.locked_color_container)
-            onContainerColor = ContextCompat.getColor(mContext, R.color.locked_color_on_container)
-        } else if (stream == AudioManager.STREAM_VOICE_CALL) {
-            containerColor = ContextCompat.getColor(mContext, R.color.call_color_container)
-            onContainerColor = ContextCompat.getColor(mContext, R.color.call_color_on_container)
-        } else if (stream == AudioManager.STREAM_MUSIC) {
-            containerColor = ContextCompat.getColor(mContext, R.color.media_color_container)
-            onContainerColor = ContextCompat.getColor(mContext, R.color.media_color_on_container)
-        } else if (stream == AudioManager.STREAM_RING || stream == AudioManager.STREAM_NOTIFICATION) {
-            containerColor = ContextCompat.getColor(mContext, R.color.ring_color_container)
-            onContainerColor = ContextCompat.getColor(mContext, R.color.ring_color_on_container)
+
+            holder.binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
+            holder.binding.streamIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
+
+            holder.binding.slider.thumbTintList = ColorStateList.valueOf(containerColor)
+            holder.binding.slider.trackActiveTintList = ColorStateList.valueOf(containerColor)
+            holder.binding.slider.trackInactiveTintList = ColorStateList.valueOf(containerColor)
         } else {
-            val containerAttr = STREAM_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorPrimaryContainer
-            val onContainerAttr = STREAM_ON_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorOnPrimaryContainer
-            containerColor = MaterialColors.getColor(holder.binding.root, containerAttr)
-            onContainerColor = MaterialColors.getColor(holder.binding.root, onContainerAttr)
+            if (isLocked) {
+                containerColor = ContextCompat.getColor(mContext, R.color.locked_color_container)
+                onContainerColor = ContextCompat.getColor(mContext, R.color.locked_color_on_container)
+            } else if (stream == AudioManager.STREAM_VOICE_CALL) {
+                containerColor = ContextCompat.getColor(mContext, R.color.call_color_container)
+                onContainerColor = ContextCompat.getColor(mContext, R.color.call_color_on_container)
+            } else if (stream == AudioManager.STREAM_MUSIC) {
+                containerColor = ContextCompat.getColor(mContext, R.color.media_color_container)
+                onContainerColor = ContextCompat.getColor(mContext, R.color.media_color_on_container)
+            } else if (stream == AudioManager.STREAM_RING || stream == AudioManager.STREAM_NOTIFICATION) {
+                containerColor = ContextCompat.getColor(mContext, R.color.ring_color_container)
+                onContainerColor = ContextCompat.getColor(mContext, R.color.ring_color_on_container)
+            } else {
+                val containerAttr = STREAM_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorPrimaryContainer
+                val onContainerAttr = STREAM_ON_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorOnPrimaryContainer
+                containerColor = MaterialColors.getColor(holder.binding.root, containerAttr)
+                onContainerColor = MaterialColors.getColor(holder.binding.root, onContainerAttr)
+            }
+
+            holder.binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
+            holder.binding.streamIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
+
+            holder.binding.slider.thumbTintList = ColorStateList.valueOf(onContainerColor)
+            holder.binding.slider.trackActiveTintList = ColorStateList.valueOf(onContainerColor)
+            holder.binding.slider.trackInactiveTintList = ColorStateList.valueOf(containerColor)
         }
-
-        holder.binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
-        holder.binding.streamIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
-
-        holder.binding.slider.thumbTintList = ColorStateList.valueOf(onContainerColor)
-        holder.binding.slider.trackActiveTintList = ColorStateList.valueOf(onContainerColor)
-        holder.binding.slider.trackInactiveTintList = ColorStateList.valueOf(containerColor)
 
         val alphaVal = if (isLocked) 0.5f else 1.0f
         holder.binding.mediaTextView.alpha = alphaVal
