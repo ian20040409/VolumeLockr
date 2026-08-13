@@ -16,7 +16,8 @@ object AdbController {
             var stream: AdbStream? = null
             try {
                 val crypto = AdbKeyManager.getCrypto(context)
-                socket = Socket(ip, 5555)
+                socket = Socket()
+                socket.connect(java.net.InetSocketAddress(ip, 5555), 3000)
                 socket.soTimeout = 10000
                 
                 connection = AdbConnection.create(socket, crypto)
@@ -51,7 +52,8 @@ object AdbController {
             var stream: AdbStream? = null
             try {
                 val crypto = AdbKeyManager.getCrypto(context)
-                socket = Socket(ip, 5555)
+                socket = Socket()
+                socket.connect(java.net.InetSocketAddress(ip, 5555), 3000)
                 socket.soTimeout = 10000
                 
                 connection = AdbConnection.create(socket, crypto)

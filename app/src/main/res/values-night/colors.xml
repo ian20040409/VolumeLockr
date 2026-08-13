@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="call_color_container">#1B5E20</color>
+    <color name="call_color_on_container">#A5D6A7</color>
+    <color name="locked_color_container">#424242</color>
+    <color name="locked_color_on_container">#9E9E9E</color>
+    <color name="media_color_container">#312E81</color>
+    <color name="media_color_on_container">#E0E7FF</color>
+    <color name="ring_color_container">#523600</color>
+    <color name="ring_color_on_container">#FFDCA8</color>
+    <color name="black_dnd_container">#212121</color>
+    <color name="black_dnd_on_container">#E0E0E0</color>
+</resources>

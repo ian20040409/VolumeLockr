@@ -88,9 +88,10 @@ class TvRemoteFragment : Fragment() {
             sendConfigCommand("hide_unlock", isChecked, false)
         }
 
-        binding.volumeSlider.addOnChangeListener { _, value, fromUser ->
+        binding.volumeSlider.addOnChangeListener { slider, value, fromUser ->
             binding.volumeValueText.text = "${value.toInt()} / ${binding.volumeSlider.valueTo.toInt()}"
             if (fromUser) {
+                slider.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
                 sendVolumeCommand(value.toInt())
             }
         }
@@ -115,15 +116,18 @@ class TvRemoteFragment : Fragment() {
         })
 
         binding.lockButton.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             val volume = binding.volumeSlider.value.toInt()
             sendLockCommand(volume, true)
         }
 
         binding.unlockButton.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             sendLockCommand(0, false)
         }
         
         binding.launchAppButton.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             sendLaunchCommand()
         }
     }

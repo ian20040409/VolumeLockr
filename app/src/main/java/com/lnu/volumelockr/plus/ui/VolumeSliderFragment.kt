@@ -64,6 +64,7 @@ class VolumeSliderFragment : Fragment() {
         
         mService?.let {
             handleServiceConnected()
+            mAdapter?.notifyDataSetChanged()
         } ?: Intent(context, VolumeService::class.java).also { intent ->
             context?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
@@ -93,8 +94,14 @@ class VolumeSliderFragment : Fragment() {
     }
 
     private fun setupQuickActions() {
-        binding.lockAllChip.setOnClickListener { lockAll() }
-        binding.unlockAllChip.setOnClickListener { unlockAll() }
+        binding.lockAllChip.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+            lockAll() 
+        }
+        binding.unlockAllChip.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+            unlockAll() 
+        }
         updateQuickActionState()
 
         val focusChangeListener = View.OnFocusChangeListener { view, hasFocus ->

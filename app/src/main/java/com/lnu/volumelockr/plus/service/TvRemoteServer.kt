@@ -26,7 +26,7 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
             try {
                 serverSocket = ServerSocket().apply {
                     reuseAddress = true
-                    bind(java.net.InetSocketAddress(8080))
+                    bind(java.net.InetSocketAddress("0.0.0.0", 8080))
                 }
                 Log.d("TvRemoteServer", "Server started on port 8080")
                 while (isActive) {

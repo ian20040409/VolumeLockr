@@ -26,6 +26,7 @@ class VolumeAdapter(
     RecyclerView.Adapter<VolumeAdapter.ViewHolder>() {
 
     companion object {
+        private var lastDndPromptTime = 0L
         private val STREAM_ICONS = mapOf(
             AudioManager.STREAM_MUSIC to R.drawable.ic_media,
             AudioManager.STREAM_VOICE_CALL to R.drawable.ic_call,
@@ -127,11 +128,37 @@ class VolumeAdapter(
     }
 
     private fun applyStreamColors(holder: ViewHolder, stream: Int, isLocked: Boolean) {
-        val containerAttr = if (isLocked) MaterialR.attr.colorSurfaceVariant else (STREAM_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorPrimaryContainer)
-        val onContainerAttr = if (isLocked) MaterialR.attr.colorOutline else (STREAM_ON_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorOnPrimaryContainer)
+        val containerColor: Int
+        val onContainerColor: Int
 
-        val containerColor = MaterialColors.getColor(holder.binding.root, containerAttr)
-        val onContainerColor = MaterialColors.getColor(holder.binding.root, onContainerAttr)
+        val hasDndAccess = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            val nm = mContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            nm.isNotificationPolicyAccessGranted
+        } else {
+            true
+        }
+
+        if (!hasDndAccess && (stream == AudioManager.STREAM_RING || stream == AudioManager.STREAM_NOTIFICATION)) {
+            containerColor = ContextCompat.getColor(mContext, R.color.black_dnd_container)
+            onContainerColor = ContextCompat.getColor(mContext, R.color.black_dnd_on_container)
+        } else if (isLocked) {
+            containerColor = ContextCompat.getColor(mContext, R.color.locked_color_container)
+            onContainerColor = ContextCompat.getColor(mContext, R.color.locked_color_on_container)
+        } else if (stream == AudioManager.STREAM_VOICE_CALL) {
+            containerColor = ContextCompat.getColor(mContext, R.color.call_color_container)
+            onContainerColor = ContextCompat.getColor(mContext, R.color.call_color_on_container)
+        } else if (stream == AudioManager.STREAM_MUSIC) {
+            containerColor = ContextCompat.getColor(mContext, R.color.media_color_container)
+            onContainerColor = ContextCompat.getColor(mContext, R.color.media_color_on_container)
+        } else if (stream == AudioManager.STREAM_RING || stream == AudioManager.STREAM_NOTIFICATION) {
+            containerColor = ContextCompat.getColor(mContext, R.color.ring_color_container)
+            onContainerColor = ContextCompat.getColor(mContext, R.color.ring_color_on_container)
+        } else {
+            val containerAttr = STREAM_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorPrimaryContainer
+            val onContainerAttr = STREAM_ON_CONTAINER_COLORS[stream] ?: MaterialR.attr.colorOnPrimaryContainer
+            containerColor = MaterialColors.getColor(holder.binding.root, containerAttr)
+            onContainerColor = MaterialColors.getColor(holder.binding.root, onContainerAttr)
+        }
 
         holder.binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
         holder.binding.streamIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
@@ -152,21 +179,26 @@ class VolumeAdapter(
         holder.binding.slider.addOnChangeListener(
             Slider.OnChangeListener { slider, value, fromUser ->
                 if (!fromUser) return@OnChangeListener
+                slider.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
 
                 if (volume.stream == AudioManager.STREAM_RING || volume.stream == AudioManager.STREAM_NOTIFICATION) {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         val nm = holder.binding.root.context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                         if (!nm.isNotificationPolicyAccessGranted) {
-                            android.widget.Toast.makeText(holder.binding.root.context, holder.binding.root.context.getString(com.lnu.volumelockr.plus.R.string.toast_grant_dnd), android.widget.Toast.LENGTH_LONG).show()
+                            val now = System.currentTimeMillis()
+                            if (now - lastDndPromptTime > 3000) {
+                                lastDndPromptTime = now
+                                android.widget.Toast.makeText(holder.binding.root.context, holder.binding.root.context.getString(com.lnu.volumelockr.plus.R.string.toast_grant_dnd), android.widget.Toast.LENGTH_LONG).show()
+                                // Launch settings
+                                try {
+                                    val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                                    holder.binding.root.context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    // Ignore
+                                }
+                            }
                             // Snap slider back
                             slider.value = mAudioManager.getStreamVolume(volume.stream).toFloat()
-                            // Launch settings
-                            try {
-                                val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-                                holder.binding.root.context.startActivity(intent)
-                            } catch (e: Exception) {
-                                // Ignore
-                            }
                             return@OnChangeListener
                         }
                     }
@@ -186,6 +218,7 @@ class VolumeAdapter(
 
     private fun registerLockButtonCallback(holder: ViewHolder, volume: Volume) {
         holder.binding.lockButton.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             val isLocked = mService?.getLocks()?.containsKey(volume.stream) == true
             if (isLocked) {
                 onVolumeUnlocked(holder, volume)
@@ -203,8 +236,11 @@ class VolumeAdapter(
 
     private fun applyLockedState(holder: ViewHolder, volume: Volume, isLocked: Boolean) {
         val iconRes = if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
-        val tintAttr = if (isLocked) android.R.attr.colorPrimary else MaterialR.attr.colorOnSurfaceVariant
-        val tintColor = MaterialColors.getColor(holder.binding.root, tintAttr)
+        val tintColor = if (isLocked) {
+            ContextCompat.getColor(mContext, R.color.locked_color_on_container)
+        } else {
+            MaterialColors.getColor(holder.binding.root, MaterialR.attr.colorOnSurfaceVariant)
+        }
 
         holder.binding.lockButton.icon = ContextCompat.getDrawable(mContext, iconRes)
         holder.binding.lockButton.iconTint = ColorStateList.valueOf(tintColor)
