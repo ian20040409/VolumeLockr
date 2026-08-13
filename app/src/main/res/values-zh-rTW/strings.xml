@@ -77,4 +77,14 @@
     <string name="autostart_on_boot_summary">裝置重新啟動後自動啟動 VolumeLockr PLUS</string>
     <string name="set_custom_volume">直接輸入音量</string>
     <string name="enter_volume_value">請輸入音量數值 (%1$d - %2$d)：</string>
+
+    <!-- Permission Banner Strings -->
+    <string name="permission_banner_title">部分權限尚未授予</string>
+    <string name="grant_permission_now">前往授權</string>
+    <string name="missing_permission_prefix">缺少：%1$s</string>
+    <string name="permission_separator">、</string>
+    <string name="perm_dnd">勿擾模式 (DND)</string>
+    <string name="perm_post_notifications">發送通知</string>
+    <string name="perm_nearby_wifi">周圍 Wi-Fi 裝置</string>
+    <string name="permission_banner_toggle_desc">展開或縮小權限說明</string>
 </resources>

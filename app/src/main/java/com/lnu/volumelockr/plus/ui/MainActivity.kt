@@ -51,19 +51,116 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    private var hasPromptedRuntimePerms = false
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        checkPermissions()
+    }
+
+    private var isBannerCollapsed = false
+
+    private fun updateBannerCollapsedState(animate: Boolean = true) {
+        binding.permissionBanner?.let { banner ->
+            if (animate) {
+                android.transition.TransitionManager.beginDelayedTransition(banner)
+            }
+            if (isBannerCollapsed) {
+                binding.permissionBannerTextContainer?.visibility = android.view.View.GONE
+                binding.permissionBannerButton?.visibility = android.view.View.GONE
+                binding.permissionBannerToggle?.visibility = android.view.View.GONE
+            } else {
+                binding.permissionBannerTextContainer?.visibility = android.view.View.VISIBLE
+                binding.permissionBannerButton?.visibility = android.view.View.VISIBLE
+                binding.permissionBannerToggle?.visibility = android.view.View.VISIBLE
+                binding.permissionBannerToggle?.setImageResource(R.drawable.ic_expand_less)
+            }
+        }
+    }
+
     private fun checkPermissions() {
+        if (::navController.isInitialized && navController.currentDestination?.id != R.id.volumeSliderFragment) {
+            binding.permissionBanner?.visibility = android.view.View.GONE
+            return
+        }
+
         val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
         val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
 
+        // Prompt system dialog once for runtime permissions on Android 13+
+        if (!hasPromptedRuntimePerms) {
+            hasPromptedRuntimePerms = true
+            checkPostNotificationsPermission()
+        }
+
+        val missingNames = mutableListOf<String>()
+
+        // 1. DND Policy Permission
         val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        if (!isTv && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted) {
-            if (!isDndDialogShowing) {
-                isDndDialogShowing = true
-                activeDndDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                    .setTitle("需要勿擾模式權限")
-                    .setMessage("請授予勿擾模式(DND)權限，否則將無法調整與鎖定鈴聲音量。")
-                    .setPositiveButton("前往設定") { _, _ ->
-                        isDndDialogShowing = false
+        val isDndMissing = !isTv && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted
+        if (isDndMissing) {
+            missingNames.add(getString(R.string.perm_dnd))
+        }
+
+        // 2. Notification Permission
+        var isNotificationMissing = false
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                isNotificationMissing = true
+                missingNames.add(getString(R.string.perm_post_notifications))
+            }
+        }
+
+        // 3. Nearby Wi-Fi Permission
+        var isNearbyMissing = false
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.NEARBY_WIFI_DEVICES
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                isNearbyMissing = true
+                missingNames.add(getString(R.string.perm_nearby_wifi))
+            }
+        }
+
+        // Update Banner UI
+        binding.permissionBanner?.let { banner ->
+            if (missingNames.isNotEmpty()) {
+                banner.visibility = android.view.View.VISIBLE
+                val separator = getString(R.string.permission_separator)
+                val namesStr = missingNames.joinToString(separator)
+                binding.permissionBannerMessage?.text = getString(R.string.missing_permission_prefix, namesStr)
+
+                updateBannerCollapsedState(animate = false)
+
+                banner.setOnClickListener {
+                    if (isBannerCollapsed) {
+                        isBannerCollapsed = false
+                        updateBannerCollapsedState()
+                    }
+                }
+
+                binding.permissionBannerToggle?.setOnClickListener {
+                    isBannerCollapsed = !isBannerCollapsed
+                    updateBannerCollapsedState()
+                }
+
+                binding.permissionBannerTitle?.setOnClickListener {
+                    isBannerCollapsed = !isBannerCollapsed
+                    updateBannerCollapsedState()
+                }
+
+                binding.permissionBannerButton?.setOnClickListener {
+                    if (isDndMissing) {
                         try {
                             val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
                             startActivity(intent)
@@ -71,21 +168,44 @@ class MainActivity : AppCompatActivity() {
                             e.printStackTrace()
                         }
                     }
-                    .setNegativeButton("忽略") { dialog, _ ->
-                        isDndDialogShowing = false
-                        dialog.dismiss()
-                        checkPostNotificationsPermission()
-                    }
-                    .setOnCancelListener {
-                        isDndDialogShowing = false
-                        checkPostNotificationsPermission()
-                    }
-                    .show()
-            }
-            return
-        }
 
-        checkPostNotificationsPermission()
+                    if (isNotificationMissing || isNearbyMissing) {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                            val permsToReq = mutableListOf<String>()
+                            if (isNotificationMissing) permsToReq.add(android.Manifest.permission.POST_NOTIFICATIONS)
+                            if (isNearbyMissing) permsToReq.add(android.Manifest.permission.NEARBY_WIFI_DEVICES)
+
+                            val shouldShowRationale = permsToReq.any {
+                                androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(this, it)
+                            }
+
+                            if (!shouldShowRationale) {
+                                openAppSettings()
+                            } else {
+                                androidx.core.app.ActivityCompat.requestPermissions(
+                                    this,
+                                    permsToReq.toTypedArray(),
+                                    101
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                banner.visibility = android.view.View.GONE
+            }
+        }
+    }
+
+    private fun openAppSettings() {
+        try {
+            val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = android.net.Uri.fromParts("package", packageName, null)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun checkPostNotificationsPermission() {
@@ -180,6 +300,12 @@ class MainActivity : AppCompatActivity() {
                 applyThemeColors(isTvRemote = true)
             } else {
                 applyThemeColors(isTvRemote = false)
+            }
+
+            if (destination.id == R.id.volumeSliderFragment) {
+                checkPermissions()
+            } else {
+                binding.permissionBanner?.visibility = android.view.View.GONE
             }
         }
         
