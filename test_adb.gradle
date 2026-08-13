@@ -1,3 +1,0 @@
-plugins { id 'java' }
-repositories { mavenCentral() }
-dependencies { implementation 'com.tananaev:adblib:1.3' }

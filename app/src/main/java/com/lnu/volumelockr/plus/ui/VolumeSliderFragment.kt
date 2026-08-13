@@ -18,6 +18,7 @@ import androidx.preference.PreferenceManager
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.FragmentVolumeSliderBinding
 import com.lnu.volumelockr.plus.service.VolumeService
+import com.lnu.volumelockr.plus.util.SecurityUtils
 
 class VolumeSliderFragment : Fragment() {
 
@@ -88,19 +89,24 @@ class VolumeSliderFragment : Fragment() {
         val spanCount = if (resources.getBoolean(R.bool.use_two_columns)) 2 else 1
         binding.recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(requireContext(), spanCount)
         mAdapter = VolumeAdapter(service.getVolumes(), service, requireContext()).also { adapter ->
-            adapter.onLockStateChanged = { updateSubtitle() }
+            adapter.onLockStateChanged = { 
+                updateSubtitle() 
+                updateQuickActionState()
+            }
         }
         binding.recyclerView.adapter = mAdapter
     }
 
     private fun setupQuickActions() {
-        binding.lockAllChip.setOnClickListener {
+        binding.toggleLockAllButton.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
-            lockAll() 
-        }
-        binding.unlockAllChip.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
-            unlockAll() 
+            val service = mService ?: return@setOnClickListener
+            val isAllLocked = service.getLocks().size == service.getVolumes().size
+            if (isAllLocked) {
+                unlockAll()
+            } else {
+                lockAll() 
+            }
         }
         updateQuickActionState()
 
@@ -111,8 +117,7 @@ class VolumeSliderFragment : Fragment() {
                 view.animate().scaleX(1f).scaleY(1f).translationZ(0f).setDuration(150).start()
             }
         }
-        binding.lockAllChip.onFocusChangeListener = focusChangeListener
-        binding.unlockAllChip.onFocusChangeListener = focusChangeListener
+        binding.toggleLockAllButton.onFocusChangeListener = focusChangeListener
         binding.tvPairButton.onFocusChangeListener = focusChangeListener
 
         val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
@@ -182,6 +187,7 @@ class VolumeSliderFragment : Fragment() {
         }
         mAdapter?.update(service.getVolumes())
         updateSubtitle()
+        updateQuickActionState()
     }
 
     private fun unlockAll() {
@@ -195,13 +201,22 @@ class VolumeSliderFragment : Fragment() {
         }
         mAdapter?.update(service.getVolumes())
         updateSubtitle()
+        updateQuickActionState()
     }
 
     private fun updateQuickActionState() {
-        val isProtected = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            .getBoolean(SettingsFragment.PASSWORD_PROTECTED_PREFERENCE, false)
-        binding.lockAllChip.isEnabled = !isProtected
-        binding.unlockAllChip.isEnabled = !isProtected
+        val service = mService
+        if (service != null && service.getVolumes().isNotEmpty()) {
+            val isAllLocked = service.getLocks().size == service.getVolumes().size
+            if (isAllLocked) {
+                binding.toggleLockAllButton.text = getString(R.string.unlock_all)
+                binding.toggleLockAllButton.setIconResource(R.drawable.ic_lock_open)
+            } else {
+                binding.toggleLockAllButton.text = getString(R.string.lock_all)
+                binding.toggleLockAllButton.setIconResource(R.drawable.ic_lock)
+            }
+        }
+        binding.toggleLockAllButton.isEnabled = true
         
         val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
         val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION

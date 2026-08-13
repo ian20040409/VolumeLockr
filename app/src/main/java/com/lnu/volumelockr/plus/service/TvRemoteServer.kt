@@ -17,6 +17,50 @@ import java.net.Socket
 import kotlinx.coroutines.CoroutineScope
 
 class TvRemoteServer(private val context: Context, private val serviceScope: CoroutineScope) {
+    companion object {
+        private const val PREF_AUTH_TOKEN = "tv_auth_token"
+        private const val PIN_EXPIRATION_MS = 60000L // 1 minute
+
+        @Volatile
+        private var currentPin: String? = null
+        @Volatile
+        private var pinTimestamp: Long = 0L
+
+        fun getAuthToken(context: Context): String {
+            val prefs = context.getSharedPreferences("tv_remote_auth", Context.MODE_PRIVATE)
+            var token = prefs.getString(PREF_AUTH_TOKEN, null)
+            if (token.isNullOrEmpty() || token.length < 16) {
+                token = java.util.UUID.randomUUID().toString().replace("-", "")
+                prefs.edit().putString(PREF_AUTH_TOKEN, token).apply()
+            }
+            return token
+        }
+
+        @Synchronized
+        fun getOrGeneratePairingPin(): Pair<String, Int> {
+            val now = System.currentTimeMillis()
+            val elapsed = now - pinTimestamp
+            if (currentPin == null || elapsed >= PIN_EXPIRATION_MS) {
+                currentPin = String.format("%06d", (0..999999).random())
+                pinTimestamp = now
+            }
+            val remainingSec = ((PIN_EXPIRATION_MS - (now - pinTimestamp)) / 1000).toInt().coerceAtLeast(0)
+            return Pair(currentPin!!, remainingSec)
+        }
+
+        @Synchronized
+        fun regeneratePairingPin() {
+            currentPin = String.format("%06d", (0..999999).random())
+            pinTimestamp = System.currentTimeMillis()
+        }
+
+        fun isValidPin(pin: String?): Boolean {
+            if (pin.isNullOrEmpty() || currentPin == null) return false
+            val elapsed = System.currentTimeMillis() - pinTimestamp
+            return elapsed <= PIN_EXPIRATION_MS && pin == currentPin
+        }
+    }
+
     private var serverSocket: ServerSocket? = null
     private var job: Job? = null
 
@@ -50,6 +94,12 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
         }
     }
 
+    private fun notifyPairingSuccess() {
+        val intent = Intent("com.lnu.volumelockr.plus.ACTION_PAIRED_SUCCESS")
+        intent.setPackage(context.packageName)
+        context.sendBroadcast(intent)
+    }
+
     private fun handleClient(client: Socket) {
         try {
             val reader = BufferedReader(InputStreamReader(client.getInputStream()))
@@ -57,6 +107,24 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
 
             val requestLine = reader.readLine() ?: return
             Log.d("TvRemoteServer", "Request: $requestLine")
+
+            val pathAndQuery = requestLine.split(" ").getOrNull(1) ?: ""
+            val query = pathAndQuery.substringAfter("?", "")
+            val params = parseQuery(query)
+
+            val clientToken = params["token"] ?: params["pin"]
+            val serverToken = getAuthToken(context)
+            val isPinValid = isValidPin(clientToken)
+
+            if (clientToken != serverToken && !isPinValid) {
+                sendResponse(output, 401, "Unauthorized")
+                return
+            }
+
+            if (isPinValid) {
+                regeneratePairingPin()
+                notifyPairingSuccess()
+            }
 
             if (requestLine.startsWith("GET /ping")) {
                 val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -72,76 +140,59 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                 val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
                 val hideUnlock = prefs.getBoolean("hide_tv_unlock_ui", true)
                 
-                sendResponse(output, 200, "OK,$maxVolume,$currentVolume,$hideIcon,$hideUnlock")
+                sendResponse(output, 200, "OK,$serverToken,$maxVolume,$currentVolume,$hideIcon,$hideUnlock")
             } else if (requestLine.startsWith("GET /set_lock")) {
-                val parts = requestLine.split(" ")
-                if (parts.size >= 2) {
-                    val pathAndQuery = parts[1]
-                    val query = pathAndQuery.substringAfter("?", "")
-                    val params = parseQuery(query)
+                val stream = params["stream"]?.toIntOrNull()
+                val volume = params["volume"]?.toIntOrNull()
+                val locked = params["locked"]?.toBoolean()
 
-                    val stream = params["stream"]?.toIntOrNull()
-                    val volume = params["volume"]?.toIntOrNull()
-                    val locked = params["locked"]?.toBoolean()
+                if (stream != null && locked != null) {
+                    val intent = Intent(context, VolumeService::class.java).apply {
+                        action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
+                        putExtra("stream", stream)
+                        putExtra("locked", locked)
+                        if (volume != null) {
+                            putExtra("volume", volume)
+                        }
+                    }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
+                    sendResponse(output, 200, "OK")
+                } else {
+                    sendResponse(output, 400, "Bad Request")
+                }
+            } else if (requestLine.startsWith("GET /set_volume")) {
+                val stream = params["stream"]?.toIntOrNull()
+                val volume = params["volume"]?.toIntOrNull()
 
-                    if (stream != null && locked != null) {
+                if (stream != null && volume != null) {
+                    try {
+                        val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                        am.setStreamVolume(stream, volume, 0)
+
                         val intent = Intent(context, VolumeService::class.java).apply {
                             action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
                             putExtra("stream", stream)
-                            putExtra("locked", locked)
-                            if (volume != null) {
-                                putExtra("volume", volume)
-                            }
+                            putExtra("volume", volume)
+                            putExtra("update_if_locked_only", true)
                         }
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                             context.startForegroundService(intent)
                         } else {
                             context.startService(intent)
                         }
+
                         sendResponse(output, 200, "OK")
-                    } else {
-                        sendResponse(output, 400, "Bad Request")
+                    } catch (e: Exception) {
+                        sendResponse(output, 500, "Internal Server Error")
                     }
-                }
-            } else if (requestLine.startsWith("GET /set_volume")) {
-                val parts = requestLine.split(" ")
-                if (parts.size >= 2) {
-                    val pathAndQuery = parts[1]
-                    val query = pathAndQuery.substringAfter("?", "")
-                    val params = parseQuery(query)
-
-                    val stream = params["stream"]?.toIntOrNull()
-                    val volume = params["volume"]?.toIntOrNull()
-
-                    if (stream != null && volume != null) {
-                        try {
-                            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                            am.setStreamVolume(stream, volume, 0)
-
-                            val intent = Intent(context, VolumeService::class.java).apply {
-                                action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
-                                putExtra("stream", stream)
-                                putExtra("volume", volume)
-                                putExtra("update_if_locked_only", true)
-                            }
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                context.startForegroundService(intent)
-                            } else {
-                                context.startService(intent)
-                            }
-
-                            sendResponse(output, 200, "OK")
-                        } catch (e: Exception) {
-                            sendResponse(output, 500, "Internal Server Error")
-                        }
-                    } else {
-                        sendResponse(output, 400, "Bad Request")
-                    }
+                } else {
+                    sendResponse(output, 400, "Bad Request")
                 }
             } else if (requestLine.startsWith("GET /hide_icon")) {
-                val parts = requestLine.split(" ")
-                val query = parts[1].substringAfter("?", "")
-                val params = parseQuery(query)
                 val hide = params["hide"]?.toBoolean() ?: true
                 
                 val state = if (hide) {
@@ -168,9 +219,6 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                 
                 sendResponse(output, 200, "OK")
             } else if (requestLine.startsWith("GET /hide_unlock")) {
-                val parts = requestLine.split(" ")
-                val query = parts[1].substringAfter("?", "")
-                val params = parseQuery(query)
                 val hide = params["hide"]?.toBoolean() ?: true
                 
                 val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)

@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.ActivityPairingBinding
+import com.lnu.volumelockr.plus.service.TvRemoteServer
 import com.lnu.volumelockr.plus.service.VolumeService
 import java.net.NetworkInterface
 
@@ -20,21 +21,50 @@ class PairingActivity : AppCompatActivity() {
         override fun onServiceDisconnected(name: android.content.ComponentName?) {}
     }
 
+    private val pinHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val pinRunnable = object : Runnable {
+        override fun run() {
+            val (pin, remainingSec) = TvRemoteServer.getOrGeneratePairingPin()
+            binding.pinCodeText.text = getString(R.string.pairing_pin_label, pin, remainingSec)
+            pinHandler.postDelayed(this, 1000)
+        }
+    }
+
+    private val pairedReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+            if (intent?.action == "com.lnu.volumelockr.plus.ACTION_PAIRED_SUCCESS") {
+                android.widget.Toast.makeText(this@PairingActivity, R.string.toast_connected, android.widget.Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         VolumeService.start(this)
         val intent = android.content.Intent(this, VolumeService::class.java)
         bindService(intent, connection, android.content.Context.BIND_AUTO_CREATE)
         isBound = true
+        pinHandler.post(pinRunnable)
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            pairedReceiver,
+            android.content.IntentFilter("com.lnu.volumelockr.plus.ACTION_PAIRED_SUCCESS"),
+            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onStop() {
         super.onStop()
+        runCatching { unregisterReceiver(pairedReceiver) }
+        pinHandler.removeCallbacks(pinRunnable)
         if (isBound) {
             runCatching { unbindService(connection) }
             isBound = false
         }
     }
+
+    private lateinit var binding: ActivityPairingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +75,7 @@ class PairingActivity : AppCompatActivity() {
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        val binding = ActivityPairingBinding.inflate(layoutInflater)
+        binding = ActivityPairingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
@@ -68,9 +98,14 @@ class PairingActivity : AppCompatActivity() {
         val ipAddress = getLocalIpAddress() ?: "Unknown"
         binding.ipAddressText.text = ipAddress
 
+        val (pin, remainingSec) = TvRemoteServer.getOrGeneratePairingPin()
+        binding.pinCodeText.text = getString(R.string.pairing_pin_label, pin, remainingSec)
+
+        val token = TvRemoteServer.getAuthToken(this)
         if (ipAddress != "Unknown") {
             try {
-                val bitMatrix = com.google.zxing.qrcode.QRCodeWriter().encode(ipAddress, com.google.zxing.BarcodeFormat.QR_CODE, 512, 512)
+                val qrData = "ip=$ipAddress&token=$token"
+                val bitMatrix = com.google.zxing.qrcode.QRCodeWriter().encode(qrData, com.google.zxing.BarcodeFormat.QR_CODE, 512, 512)
                 val width = bitMatrix.width
                 val height = bitMatrix.height
                 val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.RGB_565)

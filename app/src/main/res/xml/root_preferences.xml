@@ -16,19 +16,12 @@
 
   </PreferenceCategory>
 
-  <PreferenceCategory app:title="@string/password_header">
-
-    <SwitchPreferenceCompat
-        app:key="password_protected"
-        app:title="@string/password_protected"
-        app:summary="@string/password_protected_summary" />
-
-    <Preference
-        app:key="password"
-        app:title="@string/change_password"
-        app:summary="@string/change_password_summary" />
-
-  </PreferenceCategory>
+    <PreferenceCategory app:title="@string/password_header">
+        <Preference
+            app:key="password_settings_entry"
+            app:title="@string/password_header"
+            app:summary="@string/password_protected_summary" />
+    </PreferenceCategory>
 
   <PreferenceCategory 
       app:title="@string/tv_settings_header"

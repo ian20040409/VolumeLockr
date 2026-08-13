@@ -31,8 +31,11 @@
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">Pair Device</string>
     <string name="pair_with_phone_title">Pair with Phone</string>
-    <string name="pair_with_phone_description">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address:</string>
+    <string name="pair_with_phone_description">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address and PIN:</string>
     <string name="pair_with_phone_message">Open the VolumeLockr PLUS app on your phone, go to \'TV Remote\', and enter this IP address:\n\n%1$s</string>
+    <string name="pairing_pin_label">Pairing PIN: %1$s (%2$ds)</string>
+    <string name="enter_pairing_pin_title">Enter Pairing PIN</string>
+    <string name="enter_pairing_pin_message">Please enter the 6-digit PIN displayed on your TV screen:</string>
 
     <!-- About Screen Strings -->
     <string name="about_app_description">Simple and powerful volume lock &amp; TV remote tool for Android and Android TV.</string>
@@ -49,11 +52,16 @@
     <string name="open_system_sound_settings">Open System Sound Settings</string>
 
     <string name="password_header">Password</string>
-    <string name="password_protected">Enable password protection</string>
+    <string name="password_protected">Enable password lock</string>
     <string name="change_password">Change password</string>
     <string name="enter_password">Enter password</string>
     <string name="password_too_short">Password must be at least %d characters</string>
     <string name="password_save_error">Failed to save password</string>
+    <string name="biometric_protected">Enable fingerprint / face unlock</string>
+    <string name="biometric_protected_summary">Use fingerprint or face recognition to authenticate</string>
+    <string name="biometric_prompt_title">Biometric Authentication</string>
+    <string name="biometric_prompt_subtitle">Scan your fingerprint or face to continue</string>
+    <string name="biometric_not_available">Biometric authentication is not available on this device</string>
 
     <string name="limiting_header">Volume Limits</string>
     <string name="allow_lower">Allow lowering volume</string>
@@ -65,7 +73,7 @@
     <string name="locked_subtitle">%1$d of %2$d locked</string>
 
     <string name="allow_lower_summary">Allow the system to lower the volume below the locked level</string>
-    <string name="password_protected_summary">Require a password to change lock settings</string>
+    <string name="password_protected_summary">Require password or biometric to open the app</string>
     <string name="change_password_summary">Set or update the unlock password</string>
 
     <string name="tv_settings_header">TV Settings</string>

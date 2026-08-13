@@ -32,8 +32,11 @@
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">與手機配對</string>
     <string name="pair_with_phone_title">與手機配對</string>
-    <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：</string>
+    <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址與配對碼：</string>
     <string name="pair_with_phone_message">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：\n\n%1$s</string>
+    <string name="pairing_pin_label">配對碼 (PIN)：%1$s（%2$d 秒後過期銷毀）</string>
+    <string name="enter_pairing_pin_title">輸入電視配對碼</string>
+    <string name="enter_pairing_pin_message">請輸入電視畫面上顯示的 6 位數配對碼 (PIN)：</string>
 
     <!-- About Screen Strings -->
     <string name="about_app_description">簡約強大的 Android / Android TV 音量鎖定與遠端控制工具。</string>
@@ -50,11 +53,16 @@
     <string name="open_system_sound_settings">前往系統鈴聲設定</string>
 
     <string name="password_header">密碼</string>
-    <string name="password_protected">啟用密碼保護</string>
+    <string name="password_protected">啟用密碼鎖定</string>
     <string name="change_password">更改密碼</string>
     <string name="enter_password">輸入密碼</string>
     <string name="password_too_short">密碼長度必須至少為 %d 個字元</string>
     <string name="password_save_error">儲存密碼失敗</string>
+    <string name="biometric_protected">啟用指紋 / 臉部辨識解鎖</string>
+    <string name="biometric_protected_summary">使用指紋或臉部辨識進行身份驗證</string>
+    <string name="biometric_prompt_title">生物辨識驗證</string>
+    <string name="biometric_prompt_subtitle">請進行指紋或臉部辨識以繼續</string>
+    <string name="biometric_not_available">此裝置不支援或尚未設定生物辨識</string>
 
     <string name="limiting_header">音量限制</string>
     <string name="allow_lower">允許調低音量</string>
@@ -64,7 +72,7 @@
     <string name="locked_subtitle">已鎖定 %1$d / %2$d</string>
 
     <string name="allow_lower_summary">允許系統將音量調低至鎖定數值以下</string>
-    <string name="password_protected_summary">更改鎖定設定時需要輸入密碼</string>
+    <string name="password_protected_summary">開啟應用程式時需要輸入密碼或生物辨識</string>
     <string name="change_password_summary">設定或更新解鎖密碼</string>
 
     <string name="tv_settings_header">電視設定</string>
@@ -86,5 +94,6 @@
     <string name="perm_dnd">勿擾模式 (DND)</string>
     <string name="perm_post_notifications">發送通知</string>
     <string name="perm_nearby_wifi">周圍 Wi-Fi 裝置</string>
-    <string name="permission_banner_toggle_desc">展開或縮小權限說明</string>
+    <string name="perm_local_network">區域網路存取</string>
+    <string name="permission_banner_toggle_desc">展開或收合權限詳細資訊</string>
 </resources>

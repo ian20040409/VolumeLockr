@@ -25,7 +25,7 @@
     <string name="unlock_all">Tout déverrouiller</string>
     <string name="locked_subtitle">%1$d de %2$d verrouillé(s)</string>
     <string name="allow_lower_summary">Autoriser le système à baisser le volume en dessous du niveau verrouillé</string>
-    <string name="password_protected_summary">Demander un mot de passe pour modifier les paramètres de verrouillage</string>
+    <string name="password_protected_summary">Require password or biometric to open the app</string>
     <string name="change_password_summary">Définir ou mettre à jour le mot de passe de déverrouillage</string>
 
 </resources>

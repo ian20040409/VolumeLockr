@@ -18,9 +18,11 @@ navigationFragmentKtx = "2.9.5"
 preferenceKtx = "1.2.1"
 securityCrypto = "1.1.0-alpha06"
 zxing = "3.5.3"
+biometric = "1.2.0-alpha05"
 playServicesCodeScanner = "16.1.0"
 
 [libraries]
+biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 aboutlibraries = { module = "com.mikepenz:aboutlibraries", version.ref = "aboutlibraries" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibrariesCore" }
 aboutlibraries-plugin = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutlibrariesPlugin" }

@@ -80,6 +80,18 @@
                             android:textColor="?android:attr/textColorPrimary"
                             tools:text="192.168.1.100" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/pin_code_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="monospace"
+                        android:textSize="36sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:gravity="center"
+                        tools:text="Pairing PIN: 615001 (11s)" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
             

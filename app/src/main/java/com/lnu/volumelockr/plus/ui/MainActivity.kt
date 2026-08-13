@@ -15,7 +15,14 @@ import com.google.android.material.navigation.NavigationBarView
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.ActivityMainBinding
 
+import com.lnu.volumelockr.plus.util.SecurityUtils
+
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        var isAppUnlocked = false
+    }
+
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -29,6 +36,34 @@ class MainActivity : AppCompatActivity() {
         setupWindowInsets()
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        binding.unlockButton?.setOnClickListener {
+            if (!isAppUnlocked && (SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this))) {
+                SecurityUtils.authenticate(
+                    this,
+                    onSuccess = {
+                        isAppUnlocked = true
+                        binding.lockOverlay?.visibility = android.view.View.GONE
+                    },
+                    onCancel = {
+                        // User cancelled or dismissed the dialog. The overlay remains visible.
+                        // They can tap the unlock button to try again.
+                    }
+                )
+            }
+        }
+
+        if (!isAppUnlocked && (SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this))) {
+            binding.lockOverlay?.visibility = android.view.View.VISIBLE
+            // Automatically trigger the authentication dialog when the app starts and is locked
+            binding.unlockButton?.performClick()
+        } else {
+            binding.lockOverlay?.visibility = android.view.View.GONE
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         checkPermissions()
@@ -40,6 +75,13 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         binding.toolbar.dismissPopupMenus()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            isAppUnlocked = false
+        }
     }
 
     override fun onDestroy() {

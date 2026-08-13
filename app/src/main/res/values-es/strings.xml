@@ -26,7 +26,7 @@
     <string name="locked_subtitle">%1$d de %2$d bloqueados</string>
 
     <string name="allow_lower_summary">Permitir que el sistema baje el volumen por debajo del nivel bloqueado</string>
-    <string name="password_protected_summary">Requiere una contraseña para cambiar la configuración de bloqueo</string>
+    <string name="password_protected_summary">Require password or biometric to open the app</string>
     <string name="change_password_summary">Establecer o actualizar la contraseña de desbloqueo</string>
 
     <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>

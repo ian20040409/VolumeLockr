@@ -73,6 +73,11 @@ class TvRemoteFragment : Fragment() {
                     barcode.rawValue?.let { scannedRaw ->
                         val ipRegex = Regex("""\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b""")
                         val cleanIp = ipRegex.find(scannedRaw)?.value ?: scannedRaw.trim()
+                        val tokenRegex = Regex("""token=([a-zA-Z0-9_-]+)""")
+                        val scannedToken = tokenRegex.find(scannedRaw)?.groupValues?.get(1)
+                        if (!scannedToken.isNullOrEmpty()) {
+                            saveTokenForIp(cleanIp, scannedToken)
+                        }
                         binding.ipAddressInput.setText(cleanIp, false)
                         currentIp = cleanIp
                         testConnection()
@@ -87,7 +92,14 @@ class TvRemoteFragment : Fragment() {
             val ip = binding.ipAddressInput.text.toString().trim()
             if (ip.isNotEmpty()) {
                 currentIp = ip
-                testConnection()
+                if (getTokenForIp(currentIp).isEmpty()) {
+                    showPinInputDialog { pin ->
+                        saveTokenForIp(currentIp, pin)
+                        testConnection()
+                    }
+                } else {
+                    testConnection()
+                }
             } else {
                 Toast.makeText(context, R.string.toast_enter_ip, Toast.LENGTH_SHORT).show()
             }
@@ -169,12 +181,23 @@ class TvRemoteFragment : Fragment() {
         }
     }
 
+    private fun getTokenForIp(ip: String): String {
+        val prefs = context?.getSharedPreferences("tv_remote_tokens", Context.MODE_PRIVATE)
+        return prefs?.getString("token_$ip", "") ?: ""
+    }
+
+    private fun saveTokenForIp(ip: String, token: String) {
+        val prefs = context?.getSharedPreferences("tv_remote_tokens", Context.MODE_PRIVATE)
+        prefs?.edit()?.putString("token_$ip", token)?.apply()
+    }
+
     private fun sendConfigCommand(endpoint: String, hide: Boolean, useAdbRestart: Boolean) {
         if (currentIp.isEmpty()) return
         scope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val url = URL("http://$currentIp:8080/$endpoint?hide=$hide")
+                    val token = getTokenForIp(currentIp)
+                    val url = URL("http://$currentIp:8080/$endpoint?hide=$hide&token=$token")
                     val connection = url.openConnection() as HttpURLConnection
                     connection.connectTimeout = 3000
                     connection.readTimeout = 3000
@@ -202,7 +225,8 @@ class TvRemoteFragment : Fragment() {
             delay(100) // Debounce for smooth dragging
             withContext(Dispatchers.IO) {
                 try {
-                    val url = URL("http://$currentIp:8080/set_volume?stream=3&volume=$volume")
+                    val token = getTokenForIp(currentIp)
+                    val url = URL("http://$currentIp:8080/set_volume?stream=3&volume=$volume&token=$token")
                     val connection = url.openConnection() as HttpURLConnection
                     connection.connectTimeout = 3000
                     connection.readTimeout = 3000
@@ -221,7 +245,8 @@ class TvRemoteFragment : Fragment() {
         scope.launch {
             val pingResult = withContext(Dispatchers.IO) {
                 try {
-                    val url = URL("http://$currentIp:8080/ping")
+                    val token = getTokenForIp(currentIp)
+                    val url = URL("http://$currentIp:8080/ping?token=$token")
                     val connection = url.openConnection() as HttpURLConnection
                     connection.connectTimeout = 3000
                     connection.readTimeout = 3000
@@ -231,6 +256,9 @@ class TvRemoteFragment : Fragment() {
                         val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
                         connection.disconnect()
                         responseBody
+                    } else if (responseCode == 401) {
+                        connection.disconnect()
+                        "UNAUTHORIZED"
                     } else {
                         connection.disconnect()
                         null
@@ -240,25 +268,39 @@ class TvRemoteFragment : Fragment() {
                 }
             }
             binding.connectButton.isEnabled = true
-            if (pingResult != null && pingResult.startsWith("OK")) {
+            if (pingResult == "UNAUTHORIZED") {
+                Toast.makeText(context, R.string.toast_auth_required, Toast.LENGTH_SHORT).show()
+                binding.controlCard.visibility = View.GONE
+                syncJob?.cancel()
+                showPinInputDialog { pin ->
+                    saveTokenForIp(currentIp, pin)
+                    testConnection()
+                }
+            } else if (pingResult != null && pingResult.startsWith("OK")) {
                 Toast.makeText(context, R.string.toast_connected, Toast.LENGTH_SHORT).show()
                 binding.controlCard.visibility = View.VISIBLE
                 
                 val parts = pingResult.split(",")
                 if (parts.size >= 3) {
-                    val maxVol = parts[1].toFloatOrNull() ?: 15f
-                    val currVol = parts[2].toFloatOrNull() ?: 0f
+                    val tokenOrMax = parts[1]
+                    if (tokenOrMax.length >= 16) {
+                        saveTokenForIp(currentIp, tokenOrMax)
+                    }
+                    val maxVol = (if (tokenOrMax.length >= 16) parts.getOrNull(2) else parts.getOrNull(1))?.toFloatOrNull() ?: 15f
+                    val currVol = (if (tokenOrMax.length >= 16) parts.getOrNull(3) else parts.getOrNull(2))?.toFloatOrNull() ?: 0f
                     binding.volumeSlider.valueTo = maxVol
                     binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
                     binding.volumeValueText.text = "${binding.volumeSlider.value.toInt()} / ${maxVol.toInt()}"
                 }
                 
-                if (parts.size >= 5) {
+                val hideIconIdx = if (parts.getOrNull(1)?.length ?: 0 >= 16) 4 else 3
+                val hideUnlockIdx = if (parts.getOrNull(1)?.length ?: 0 >= 16) 5 else 4
+                if (parts.size > hideUnlockIdx) {
                     binding.hideIconSwitch.setOnCheckedChangeListener(null)
                     binding.hideUnlockSwitch.setOnCheckedChangeListener(null)
                     
-                    binding.hideIconSwitch.isChecked = parts[3].toBoolean()
-                    binding.hideUnlockSwitch.isChecked = parts[4].toBoolean()
+                    binding.hideIconSwitch.isChecked = parts[hideIconIdx].toBoolean()
+                    binding.hideUnlockSwitch.isChecked = parts[hideUnlockIdx].toBoolean()
                     
                     binding.hideIconSwitch.setOnCheckedChangeListener { _, isChecked ->
                         sendConfigCommand("hide_icon", isChecked, true)
@@ -302,7 +344,8 @@ class TvRemoteFragment : Fragment() {
                 if (currentIp.isNotEmpty() && binding.controlCard.visibility == View.VISIBLE) {
                     val pingResult = withContext(Dispatchers.IO) {
                         try {
-                            val url = URL("http://$currentIp:8080/ping")
+                            val token = getTokenForIp(currentIp)
+                            val url = URL("http://$currentIp:8080/ping?token=$token")
                             val connection = url.openConnection() as HttpURLConnection
                             connection.connectTimeout = 3000
                             connection.readTimeout = 3000
@@ -317,8 +360,9 @@ class TvRemoteFragment : Fragment() {
                     if (pingResult != null && pingResult.startsWith("OK")) {
                         val parts = pingResult.split(",")
                         if (parts.size >= 3) {
-                            val maxVol = parts[1].toFloatOrNull() ?: 15f
-                            val currVol = parts[2].toFloatOrNull() ?: 0f
+                            val tokenOrMax = parts[1]
+                            val maxVol = (if (tokenOrMax.length >= 16) parts.getOrNull(2) else parts.getOrNull(1))?.toFloatOrNull() ?: 15f
+                            val currVol = (if (tokenOrMax.length >= 16) parts.getOrNull(3) else parts.getOrNull(2))?.toFloatOrNull() ?: 0f
                             if (!isTrackingTouch) {
                                 binding.volumeSlider.valueTo = maxVol
                                 binding.volumeSlider.value = currVol.coerceIn(0f, maxVol)
@@ -359,12 +403,39 @@ class TvRemoteFragment : Fragment() {
             .show()
     }
 
+    private fun showPinInputDialog(onConfirm: (String) -> Unit) {
+        val context = context ?: return
+        val input = com.google.android.material.textfield.TextInputEditText(context).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = "123456"
+        }
+        val container = android.widget.FrameLayout(context).apply {
+            val padding = (24 * context.resources.displayMetrics.density).toInt()
+            setPadding(padding, padding / 2, padding, 0)
+            addView(input)
+        }
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(context.getString(R.string.enter_pairing_pin_title))
+            .setMessage(context.getString(R.string.enter_pairing_pin_message))
+            .setView(container)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val pin = input.text.toString().trim()
+                if (pin.isNotEmpty()) {
+                    onConfirm(pin)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun sendLockCommand(volume: Int, locked: Boolean) {
         scope.launch {
             val success = withContext(Dispatchers.IO) {
                 try {
+                    val token = getTokenForIp(currentIp)
                     // stream=3 is AudioManager.STREAM_MUSIC
-                    val urlString = "http://$currentIp:8080/set_lock?stream=3&volume=$volume&locked=$locked"
+                    val urlString = "http://$currentIp:8080/set_lock?stream=3&volume=$volume&locked=$locked&token=$token"
                     val url = URL(urlString)
                     val connection = url.openConnection() as HttpURLConnection
                     connection.connectTimeout = 3000

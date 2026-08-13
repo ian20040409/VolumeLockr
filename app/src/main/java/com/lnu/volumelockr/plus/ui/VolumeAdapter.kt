@@ -15,6 +15,7 @@ import com.google.android.material.slider.Slider
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.VolumeCardBinding
 import com.lnu.volumelockr.plus.service.VolumeService
+import com.lnu.volumelockr.plus.util.SecurityUtils
 import com.google.android.material.R as MaterialR
 
 class VolumeAdapter(
@@ -85,9 +86,7 @@ class VolumeAdapter(
         holder.binding.volumeValue.text = formatVolumeValue(holder.binding.slider.value.toInt(), volume.max)
 
         holder.binding.volumeValue.setOnClickListener {
-            if (!isPasswordProtected()) {
-                showDirectVolumeInputDialog(holder, volume)
-            }
+            showDirectVolumeInputDialog(holder, volume)
         }
 
         registerSeekBarCallback(holder, volume)
@@ -97,9 +96,8 @@ class VolumeAdapter(
 
         handleRingerMode(holder, volume)
 
-        if (isPasswordProtected()) {
+        if (isLocked) {
             holder.binding.slider.isEnabled = false
-            holder.binding.lockButton.isEnabled = false
         }
         
         val uiModeManager = mContext.getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager

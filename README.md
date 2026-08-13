@@ -11,11 +11,15 @@ The package name has been changed to `com.lnu.volumelockr.plus`.
 
 ### Key Modifications
 
-- **Wi-Fi Remote Control**: Integrated an HTTP-based remote control feature for adjusting TV volume via a phone.
-- **Android TV UI Optimization**: Optimized for Android TV with D-pad support and hidden unnecessary UI elements.
-- **Dynamic Launcher Icon Control**: Added ability to hide or show the app icon from the Google TV launcher dynamically.
-- **Localization**: Added Traditional Chinese (zh-TW) translation.
-- **Logic Enhancements**: Adjusted volume control logic and lock state persistence.
+- **Android TV Remote Control & Dynamic Pairing**: Control Android TV / Google TV volume and locks remotely from your phone over Wi-Fi. Features an embedded HTTP server on TV, dynamic 60-second pairing PIN generation, QR code scanning, and persistent token exchange for seamless, passwordless reconnects.
+- **Biometric & Password Protection**: Added standalone fingerprint/biometric authentication alongside PBKDF2-hashed password protection with a dedicated security settings page.
+- **Modernized UI / UX**:
+  - Unified dynamic toggle button for quick "Lock All" / "Unlock All" operations.
+  - Direct numeric volume input via tap on value labels.
+  - D-pad navigation support and adaptive UI for Android TV.
+  - Permission status banner and Do Not Disturb (DND) access alerts.
+- **Dynamic Launcher Icon Control**: Support hiding or showing the app icon from the Google TV / Android TV launcher.
+- **Localization**: Added Traditional Chinese (zh-TW) and multiple locale translations.
 
 This modified work is released under the same **GNU General Public License v3.0**, complying with open-source copyleft requirements.
 

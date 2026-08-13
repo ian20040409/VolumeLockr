@@ -26,7 +26,7 @@
     <string name="locked_subtitle">%1$d من %2$d تم قفل</string>
 
     <string name="allow_lower_summary">السماح للنظام بخفض الصوت أقل من المستوى المقفل</string>
-    <string name="password_protected_summary">يتطلب كلمة السر لتغيير إعدادات القفل</string>
+    <string name="password_protected_summary">Require password or biometric to open the app</string>
     <string name="change_password_summary">اضبط أو حدّث كلمة السر الخاصة بإلغاء القفل</string>
     
     <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>

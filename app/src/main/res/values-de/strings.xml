@@ -26,7 +26,7 @@
     <string name="locked_subtitle">%1$d von %2$d gesperrt</string>
 
     <string name="allow_lower_summary">System erlauben, die Lautstärke unter den gesperrten Wert zu senken</string>
-    <string name="password_protected_summary">Passwort zum Ändern der Sperreinstellungen erforderlich</string>
+    <string name="password_protected_summary">Require password or biometric to open the app</string>
     <string name="change_password_summary">Entsperrpasswort festlegen oder aktualisieren</string>
 
     <string name="aboutLibraries_description_text">VolumeLockr PLUS</string>
