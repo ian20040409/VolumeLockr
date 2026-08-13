@@ -26,6 +26,7 @@
     <string name="toast_command_failed">Failed to send command</string>
     <string name="toast_grant_dnd">Please grant Do Not Disturb access to change this volume</string>
     <string name="toast_autostarted">VolumeLockr PLUS started</string>
+    <string name="toast_play_services_missing">Google Play Services is not supported on this device. Please enter the IP manually.</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">Pair Device</string>

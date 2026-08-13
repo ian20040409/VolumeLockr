@@ -160,6 +160,12 @@ class MainActivity : AppCompatActivity() {
                         .start()
                 }
             }
+            
+            if (destination.id == R.id.tvRemoteFragment) {
+                applyThemeColors(isTvRemote = true)
+            } else {
+                applyThemeColors(isTvRemote = false)
+            }
         }
         
         val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
@@ -199,5 +205,88 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsCompat.CONSUMED
             }
         }
+    }
+
+    private var themeAnimator: android.animation.ValueAnimator? = null
+
+    private fun applyThemeColors(isTvRemote: Boolean) {
+        val themeContext = if (isTvRemote) {
+            android.view.ContextThemeWrapper(this, com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar)
+        } else {
+            this
+        }
+        
+        val targetSurface = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorSurface, android.graphics.Color.BLACK)
+        val targetOnSurface = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorOnSurface, android.graphics.Color.WHITE)
+        val colorSecondaryContainer = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorSecondaryContainer, android.graphics.Color.GRAY)
+        val colorOnSecondaryContainer = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorOnSecondaryContainer, android.graphics.Color.BLACK)
+        val colorOnSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorOnSurfaceVariant, android.graphics.Color.GRAY)
+        
+        val typedValue = android.util.TypedValue()
+        val hasSurfaceContainer = themeContext.theme.resolveAttribute(com.google.android.material.R.attr.colorSurfaceContainer, typedValue, true)
+        val targetBottomNavBg = if (hasSurfaceContainer) typedValue.data else targetSurface
+
+        binding.toolbar.setTitleTextColor(targetOnSurface)
+        binding.toolbar.navigationIcon?.setTint(targetOnSurface)
+
+        val navView = binding.bottomNavigation ?: binding.navigationRail
+        if (navView != null) {
+            val iconTintList = android.content.res.ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_checked)
+                ),
+                intArrayOf(colorOnSecondaryContainer, colorOnSurfaceVariant)
+            )
+            val textColorList = android.content.res.ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf(-android.R.attr.state_checked)
+                ),
+                intArrayOf(targetOnSurface, colorOnSurfaceVariant)
+            )
+            
+            if (navView is com.google.android.material.bottomnavigation.BottomNavigationView) {
+                navView.itemActiveIndicatorColor = android.content.res.ColorStateList.valueOf(colorSecondaryContainer)
+                navView.itemIconTintList = iconTintList
+                navView.itemTextColor = textColorList
+            } else if (navView is com.google.android.material.navigationrail.NavigationRailView) {
+                navView.itemActiveIndicatorColor = android.content.res.ColorStateList.valueOf(colorSecondaryContainer)
+                navView.itemIconTintList = iconTintList
+                navView.itemTextColor = textColorList
+            }
+        }
+
+        val initialSurface = window.statusBarColor
+        val initialBottomNavBg = window.navigationBarColor
+
+        themeAnimator?.cancel()
+        themeAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 300
+            val argbEvaluator = android.animation.ArgbEvaluator()
+            addUpdateListener { animator ->
+                val fraction = animator.animatedFraction
+                val currentSurface = argbEvaluator.evaluate(fraction, initialSurface, targetSurface) as Int
+                val currentBottomNavBg = argbEvaluator.evaluate(fraction, initialBottomNavBg, targetBottomNavBg) as Int
+
+                binding.appBarLayout.setBackgroundColor(currentSurface)
+                binding.toolbar.setBackgroundColor(currentSurface)
+                window.statusBarColor = currentSurface
+                window.navigationBarColor = currentBottomNavBg
+
+                if (navView is com.google.android.material.bottomnavigation.BottomNavigationView) {
+                    navView.setBackgroundColor(currentBottomNavBg)
+                } else if (navView is com.google.android.material.navigationrail.NavigationRailView) {
+                    navView.setBackgroundColor(currentBottomNavBg)
+                }
+            }
+            start()
+        }
+
+        val isLightSurface = androidx.core.graphics.ColorUtils.calculateLuminance(targetSurface) > 0.5
+        val isLightBottomNavBg = androidx.core.graphics.ColorUtils.calculateLuminance(targetBottomNavBg) > 0.5
+        val windowInsetsController = androidx.core.view.WindowInsetsControllerCompat(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = isLightSurface
+        windowInsetsController.isAppearanceLightNavigationBars = isLightBottomNavBg
     }
 }

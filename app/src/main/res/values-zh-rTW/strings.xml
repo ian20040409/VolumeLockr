@@ -27,6 +27,7 @@
     <string name="toast_command_failed">無法傳送指令</string>
     <string name="toast_grant_dnd">請先授權「零打擾」存取權限，才能調整此音量</string>
     <string name="toast_autostarted">VolumeLockr PLUS 已啟動</string>
+    <string name="toast_play_services_missing">此裝置不支援 Google Play 服務，請手動輸入 IP</string>
 
     <!-- Pairing Dialog Strings -->
     <string name="pair_device_show_ip">與手機配對</string>

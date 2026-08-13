@@ -33,7 +33,9 @@ class TvRemoteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTvRemoteBinding.inflate(inflater, container, false)
+        val contextThemeWrapper = android.view.ContextThemeWrapper(requireContext(), com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar)
+        val localInflater = inflater.cloneInContext(contextThemeWrapper)
+        _binding = FragmentTvRemoteBinding.inflate(localInflater, container, false)
         return binding.root
     }
 
@@ -51,6 +53,17 @@ class TvRemoteFragment : Fragment() {
         }
 
         binding.scanQrButton.setOnClickListener {
+            val googleApiAvailability = com.google.android.gms.common.GoogleApiAvailability.getInstance()
+            val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(requireContext())
+            if (resultCode != com.google.android.gms.common.ConnectionResult.SUCCESS) {
+                if (googleApiAvailability.isUserResolvableError(resultCode)) {
+                    googleApiAvailability.getErrorDialog(requireActivity(), resultCode, 9000)?.show()
+                } else {
+                    Toast.makeText(context, R.string.toast_play_services_missing, Toast.LENGTH_SHORT).show()
+                }
+                return@setOnClickListener
+            }
+
             val options = com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions.Builder()
                 .setBarcodeFormats(com.google.mlkit.vision.barcode.common.Barcode.FORMAT_QR_CODE)
                 .build()
