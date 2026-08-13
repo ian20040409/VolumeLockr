@@ -25,7 +25,7 @@
     <string name="toast_connection_failed">連線失敗。電視端的應用程式開啟了嗎？</string>
     <string name="toast_command_sent">已傳送指令</string>
     <string name="toast_command_failed">無法傳送指令</string>
-    <string name="toast_grant_dnd">請先授權「零打擾」存取權限，才能調整此音量</string>
+    <string name="toast_grant_dnd">請先授予「勿擾」存取權限，才能調整此音量</string>
     <string name="toast_autostarted">VolumeLockr PLUS 已啟動</string>
     <string name="toast_play_services_missing">此裝置不支援 Google Play 服務，請手動輸入 IP</string>
 
@@ -34,7 +34,7 @@
     <string name="pair_with_phone_title">與手機配對</string>
     <string name="pair_with_phone_description">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址與配對碼：</string>
     <string name="pair_with_phone_message">請在手機上開啟 VolumeLockr PLUS 應用程式，前往「電視遙控器」並輸入此 IP 位址：\n\n%1$s</string>
-    <string name="pairing_pin_label">配對碼 (PIN)：%1$s（%2$d 秒後過期銷毀）</string>
+    <string name="pairing_pin_label">配對碼 (PIN)：%1$s（剩餘 %2$d 秒）</string>
     <string name="enter_pairing_pin_title">輸入電視配對碼</string>
     <string name="enter_pairing_pin_message">請輸入電視畫面上顯示的 6 位數配對碼 (PIN)：</string>
 
@@ -50,12 +50,14 @@
     <string name="ring_title">鈴聲</string>
     <string name="notification_title">通知</string>
     <string name="call_title">通話</string>
-    <string name="open_system_sound_settings">前往系統鈴聲設定</string>
+    <string name="open_system_sound_settings">前往系統音效設定</string>
 
     <string name="password_header">密碼</string>
     <string name="password_protected">啟用密碼鎖定</string>
     <string name="change_password">更改密碼</string>
     <string name="enter_password">輸入密碼</string>
+    <string name="wrong_password">密碼錯誤</string>
+    <string name="scan_qr_code">掃描 QR 碼</string>
     <string name="password_too_short">密碼長度必須至少為 %d 個字元</string>
     <string name="password_save_error">儲存密碼失敗</string>
     <string name="biometric_protected">啟用指紋 / 臉部辨識解鎖</string>

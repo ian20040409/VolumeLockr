@@ -141,7 +141,7 @@ object SecurityUtils {
                 if (verifyPassword(activity, challenger)) {
                     onSuccess()
                 } else {
-                    Toast.makeText(activity, R.string.enter_password, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, R.string.wrong_password, Toast.LENGTH_SHORT).show()
                     onCancel?.invoke()
                 }
             }

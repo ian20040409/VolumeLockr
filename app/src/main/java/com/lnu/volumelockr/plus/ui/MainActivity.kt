@@ -3,6 +3,7 @@ package com.lnu.volumelockr.plus.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,7 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationBarView
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.ActivityMainBinding
-
+import com.lnu.volumelockr.plus.util.NavigationAnimationUtils
 import com.lnu.volumelockr.plus.util.SecurityUtils
 
 class MainActivity : AppCompatActivity() {
@@ -335,33 +336,15 @@ class MainActivity : AppCompatActivity() {
 
         val navView: NavigationBarView? = binding.bottomNavigation ?: binding.navigationRail
         navView?.setupWithNavController(navController)
+
+        navView?.setOnItemReselectedListener { item ->
+            val view = navView.findViewById<View>(item.itemId)
+            NavigationAnimationUtils.animateNavigationItem(item.itemId, view)
+        }
         
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val view = navView?.findViewById<android.view.View>(destination.id)
-            val iconView = view?.findViewById<android.widget.ImageView>(com.google.android.material.R.id.navigation_bar_item_icon_view)
-            iconView?.apply {
-                if (destination.id == R.id.settingsFragment) {
-                    animate()
-                        .rotationBy(180f)
-                        .setDuration(500)
-                        .start()
-                } else {
-                    scaleX = 0.8f
-                    scaleY = 0.8f
-                    animate()
-                        .scaleX(1.2f)
-                        .scaleY(1.2f)
-                        .setDuration(350)
-                        .withEndAction {
-                            animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(400)
-                                .start()
-                        }
-                        .start()
-                }
-            }
+            val view = navView?.findViewById<View>(destination.id)
+            NavigationAnimationUtils.animateNavigationItem(destination.id, view)
             
             if (destination.id == R.id.tvRemoteFragment) {
                 applyThemeColors(isTvRemote = true)
@@ -372,13 +355,13 @@ class MainActivity : AppCompatActivity() {
             if (destination.id == R.id.volumeSliderFragment) {
                 checkPermissions()
             } else {
-                binding.permissionBanner?.visibility = android.view.View.GONE
+                binding.permissionBanner?.visibility = View.GONE
             }
         }
         
         val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
         if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
-            (navView as? android.view.View)?.visibility = android.view.View.GONE
+            (navView as? View)?.visibility = View.GONE
         }
     }
 

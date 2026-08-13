@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Scan QR Code"
+                android:text="@string/scan_qr_code"
                 app:icon="@drawable/ic_qr_code_scanner"
                 app:iconGravity="textStart" />
 
@@ -134,6 +134,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_media"
+                    android:contentDescription="@string/media_title"
                     app:tint="?attr/colorPrimary" />
 
                 <com.google.android.material.slider.Slider
