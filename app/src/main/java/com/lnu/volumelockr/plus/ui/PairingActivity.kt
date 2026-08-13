@@ -1,12 +1,19 @@
 package com.lnu.volumelockr.plus.ui
 
+import android.app.UiModeManager
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.ActivityPairingBinding
 import com.lnu.volumelockr.plus.service.TvRemoteServer
@@ -31,9 +38,9 @@ class PairingActivity : AppCompatActivity() {
     }
 
     private val pairedReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+        override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.lnu.volumelockr.plus.ACTION_PAIRED_SUCCESS") {
-                android.widget.Toast.makeText(this@PairingActivity, R.string.toast_connected, android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@PairingActivity, R.string.toast_connected, Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
@@ -42,15 +49,15 @@ class PairingActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         VolumeService.start(this)
-        val intent = android.content.Intent(this, VolumeService::class.java)
-        bindService(intent, connection, android.content.Context.BIND_AUTO_CREATE)
+        val intent = Intent(this, VolumeService::class.java)
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
         isBound = true
         pinHandler.post(pinRunnable)
-        androidx.core.content.ContextCompat.registerReceiver(
+        ContextCompat.registerReceiver(
             this,
             pairedReceiver,
-            android.content.IntentFilter("com.lnu.volumelockr.plus.ACTION_PAIRED_SUCCESS"),
-            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+            IntentFilter("com.lnu.volumelockr.plus.ACTION_PAIRED_SUCCESS"),
+            ContextCompat.RECEIVER_NOT_EXPORTED
         )
     }
 
@@ -67,20 +74,33 @@ class PairingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPairingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.statusBars())
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
 
         binding = ActivityPairingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { v, windowInsets ->
+            val bars = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+                    or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.setPadding(bars.left, bars.top, bars.right, 0)
+            windowInsets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.nestedScrollView) { v, windowInsets ->
+            val bars = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+                    or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.setPadding(bars.left, 0, bars.right, bars.bottom)
+            windowInsets
+        }
+
         setSupportActionBar(binding.toolbar)
-        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
-        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        val uiModeManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        val isTv = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
         supportActionBar?.title = getString(R.string.pair_with_phone_title)
         
         if (isTv) {
