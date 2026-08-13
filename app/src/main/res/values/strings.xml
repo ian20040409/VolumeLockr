@@ -84,5 +84,6 @@
     <string name="perm_dnd">Do Not Disturb (DND)</string>
     <string name="perm_post_notifications">Notifications</string>
     <string name="perm_nearby_wifi">Nearby Wi-Fi Devices</string>
+    <string name="perm_local_network">Local Network</string>
     <string name="permission_banner_toggle_desc">Toggle permission details</string>
 </resources>

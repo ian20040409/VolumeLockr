@@ -132,6 +132,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 4. Local Network Permission (Android 17+)
+        var isLocalNetworkMissing = false
+        if (android.os.Build.VERSION.SDK_INT >= 37) { // API 37 is Android 17
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    "android.permission.ACCESS_LOCAL_NETWORK"
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                isLocalNetworkMissing = true
+                missingNames.add(getString(R.string.perm_local_network))
+            }
+        }
+
         // Update Banner UI
         binding.permissionBanner?.let { banner ->
             if (missingNames.isNotEmpty()) {
@@ -169,11 +182,14 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    if (isNotificationMissing || isNearbyMissing) {
+                    if (isNotificationMissing || isNearbyMissing || isLocalNetworkMissing) {
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                             val permsToReq = mutableListOf<String>()
                             if (isNotificationMissing) permsToReq.add(android.Manifest.permission.POST_NOTIFICATIONS)
                             if (isNearbyMissing) permsToReq.add(android.Manifest.permission.NEARBY_WIFI_DEVICES)
+                            if (isLocalNetworkMissing && android.os.Build.VERSION.SDK_INT >= 37) {
+                                permsToReq.add("android.permission.ACCESS_LOCAL_NETWORK")
+                            }
 
                             val shouldShowRationale = permsToReq.any {
                                 androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(this, it)
@@ -224,6 +240,15 @@ class MainActivity : AppCompatActivity() {
                 ) != android.content.pm.PackageManager.PERMISSION_GRANTED
             ) {
                 perms.add(android.Manifest.permission.NEARBY_WIFI_DEVICES)
+            }
+            if (android.os.Build.VERSION.SDK_INT >= 37) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(
+                        this,
+                        "android.permission.ACCESS_LOCAL_NETWORK"
+                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                ) {
+                    perms.add("android.permission.ACCESS_LOCAL_NETWORK")
+                }
             }
             if (perms.isNotEmpty()) {
                 androidx.core.app.ActivityCompat.requestPermissions(
