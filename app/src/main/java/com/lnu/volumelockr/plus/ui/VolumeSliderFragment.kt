@@ -46,6 +46,12 @@ class VolumeSliderFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val spanCount = if (resources.getBoolean(R.bool.use_two_columns)) 2 else 1
+        binding.recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(requireContext(), spanCount)
+    }
+
     override fun onResume() {
         super.onResume()
         androidx.core.content.ContextCompat.registerReceiver(
@@ -119,6 +125,7 @@ class VolumeSliderFragment : Fragment() {
         }
         binding.toggleLockAllButton.onFocusChangeListener = focusChangeListener
         binding.tvPairButton.onFocusChangeListener = focusChangeListener
+        binding.aboutButton.onFocusChangeListener = focusChangeListener
 
         val uiModeManager = requireContext().getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager
         if (uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION) {
