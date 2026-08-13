@@ -134,6 +134,9 @@ class VolumeSliderFragment : Fragment() {
             binding.tvPairButton.setOnClickListener { startActivity(Intent(requireContext(), PairingActivity::class.java)) }
             binding.systemSoundSettingsButton.visibility = View.GONE
             binding.aboutButton.visibility = View.VISIBLE
+            binding.tvPairButton.post {
+                binding.tvPairButton.requestFocus()
+            }
         } else {
             binding.systemSoundSettingsButton.setOnClickListener {
                 try {
