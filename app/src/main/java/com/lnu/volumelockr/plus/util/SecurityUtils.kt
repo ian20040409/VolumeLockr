@@ -255,16 +255,24 @@ object SecurityUtils {
         dialog.show()
     }
 
+    fun generateSalt(): ByteArray {
+        val random = SecureRandom()
+        val salt = ByteArray(SALT_LENGTH)
+        random.nextBytes(salt)
+        return salt
+    }
+
+    fun hashPassword(password: String, salt: ByteArray): ByteArray {
+        val spec = PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH)
+        val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+        return factory.generateSecret(spec).encoded
+    }
+
     fun savePassword(context: Context, newPassword: String): Boolean {
         return try {
             val prefs = getSecurePreferences(context)
-            val random = SecureRandom()
-            val salt = ByteArray(SALT_LENGTH)
-            random.nextBytes(salt)
-
-            val spec = PBEKeySpec(newPassword.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH)
-            val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-            val hash = factory.generateSecret(spec).encoded
+            val salt = generateSalt()
+            val hash = hashPassword(newPassword, salt)
 
             val saltBase64 = Base64.encodeToString(salt, Base64.NO_WRAP)
             val hashBase64 = Base64.encodeToString(hash, Base64.NO_WRAP)
@@ -313,9 +321,7 @@ object SecurityUtils {
             if (saltBase64 != null && hashBase64 != null) {
                 val salt = Base64.decode(saltBase64, Base64.NO_WRAP)
                 val storedHash = Base64.decode(hashBase64, Base64.NO_WRAP)
-                val spec = PBEKeySpec(challenger.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH)
-                val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-                val computedHash = factory.generateSecret(spec).encoded
+                val computedHash = hashPassword(challenger, salt)
                 isMatch = MessageDigest.isEqual(storedHash, computedHash)
             } else {
                 val legacyEncrypted = prefs.getString(SettingsFragment.PASSWORD_CHANGE_PREFERENCE, null)

@@ -148,11 +148,11 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
 
                 if (stream != null && locked != null) {
                     val intent = Intent(context, VolumeService::class.java).apply {
-                        action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
-                        putExtra("stream", stream)
-                        putExtra("locked", locked)
+                        action = com.lnu.volumelockr.plus.util.AppConstants.ACTION_SET_LOCK
+                        putExtra(com.lnu.volumelockr.plus.util.AppConstants.EXTRA_STREAM, stream)
+                        putExtra(com.lnu.volumelockr.plus.util.AppConstants.EXTRA_LOCKED, locked)
                         if (volume != null) {
-                            putExtra("volume", volume)
+                            putExtra(com.lnu.volumelockr.plus.util.AppConstants.EXTRA_VOLUME, volume)
                         }
                     }
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -174,10 +174,10 @@ class TvRemoteServer(private val context: Context, private val serviceScope: Cor
                         am.setStreamVolume(stream, volume, 0)
 
                         val intent = Intent(context, VolumeService::class.java).apply {
-                            action = "com.lnu.volumelockr.plus.ACTION_SET_LOCK"
-                            putExtra("stream", stream)
-                            putExtra("volume", volume)
-                            putExtra("update_if_locked_only", true)
+                            action = com.lnu.volumelockr.plus.util.AppConstants.ACTION_SET_LOCK
+                            putExtra(com.lnu.volumelockr.plus.util.AppConstants.EXTRA_STREAM, stream)
+                            putExtra(com.lnu.volumelockr.plus.util.AppConstants.EXTRA_VOLUME, volume)
+                            putExtra(com.lnu.volumelockr.plus.util.AppConstants.EXTRA_UPDATE_IF_LOCKED_ONLY, true)
                         }
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                             context.startForegroundService(intent)

@@ -29,9 +29,12 @@ import com.lnu.volumelockr.plus.ui.Volume
 import java.util.Timer
 import java.util.TimerTask
 
+import com.lnu.volumelockr.plus.util.AppConstants
+
 class VolumeService : Service() {
 
     companion object {
+        private val gson = Gson()
         const val NOTIFICATION_TITLE = "VolumeLockr"
         const val NOTIFICATION_DESCRIPTION = "Service is running in background"
         const val NOTIFICATION_CHANNEL_ID = "VolumeService"
@@ -127,15 +130,13 @@ class VolumeService : Service() {
             tryShowNotification()
         }
 
-
-
-        if (intent?.action == "com.lnu.volumelockr.plus.ACTION_SET_LOCK") {
-            val stream = intent.getIntExtra("stream", -1)
+        if (intent?.action == AppConstants.ACTION_SET_LOCK) {
+            val stream = intent.getIntExtra(AppConstants.EXTRA_STREAM, -1)
             if (stream != -1) {
-                val updateIfLockedOnly = intent.getBooleanExtra("update_if_locked_only", false)
+                val updateIfLockedOnly = intent.getBooleanExtra(AppConstants.EXTRA_UPDATE_IF_LOCKED_ONLY, false)
                 if (updateIfLockedOnly) {
                     if (mVolumeLock.containsKey(stream)) {
-                        val volume = intent.getIntExtra("volume", -1)
+                        val volume = intent.getIntExtra(AppConstants.EXTRA_VOLUME, -1)
                         if (volume != -1) {
                             try {
                                 mAudioManager.setStreamVolume(stream, volume, 0)
@@ -144,9 +145,9 @@ class VolumeService : Service() {
                         }
                     }
                 } else {
-                    val locked = intent.getBooleanExtra("locked", true)
+                    val locked = intent.getBooleanExtra(AppConstants.EXTRA_LOCKED, true)
                     if (locked) {
-                        val volume = intent.getIntExtra("volume", -1)
+                        val volume = intent.getIntExtra(AppConstants.EXTRA_VOLUME, -1)
                         if (volume != -1) {
                             try {
                                 mAudioManager.setStreamVolume(stream, volume, 0)
@@ -238,7 +239,7 @@ class VolumeService : Service() {
     private fun savePreferences() {
         val sharedPreferences = getSharedPreferences(APP_SHARED_PREFERENCES, MODE_PRIVATE)
         sharedPreferences.edit {
-            putString(LOCKS_KEY, Gson().toJson(mVolumeLock))
+            putString(LOCKS_KEY, gson.toJson(mVolumeLock))
         }
     }
 
@@ -251,7 +252,7 @@ class VolumeService : Service() {
             return
         }
 
-        mVolumeLock = Gson().fromJson(value, Token().type)
+        mVolumeLock = gson.fromJson(value, Token().type)
         startLocking()
     }
 

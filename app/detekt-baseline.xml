@@ -2,11 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>ArgumentListWrapping:AboutActivity.kt$AboutActivity$(url, com.google.zxing.BarcodeFormat.QR_CODE, size, size)</ID>
-    <ID>ArgumentListWrapping:LicensesActivity.kt$LicensesActivity$(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))</ID>
-    <ID>ArgumentListWrapping:LicensesActivity.kt$LicensesActivity$(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))</ID>
-    <ID>ArgumentListWrapping:LicensesActivity.kt$LicensesActivity$(url)</ID>
-    <ID>ArgumentListWrapping:LicensesActivity.kt$LicensesActivity$(url, com.google.zxing.BarcodeFormat.QR_CODE, size, size)</ID>
     <ID>ArgumentListWrapping:MainActivity.kt$MainActivity$(android.content.Context.NOTIFICATION_SERVICE)</ID>
     <ID>ArgumentListWrapping:MainActivity.kt$MainActivity$(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)</ID>
     <ID>ArgumentListWrapping:MainActivity.kt$MainActivity$(com.google.android.material.R.attr.colorSurfaceContainer, typedValue, true)</ID>
@@ -14,9 +9,6 @@
     <ID>ArgumentListWrapping:MainActivity.kt$MainActivity$(themeContext, com.google.android.material.R.attr.colorOnSurface, android.graphics.Color.WHITE)</ID>
     <ID>ArgumentListWrapping:MainActivity.kt$MainActivity$(themeContext, com.google.android.material.R.attr.colorOnSurfaceVariant, android.graphics.Color.GRAY)</ID>
     <ID>ArgumentListWrapping:MainActivity.kt$MainActivity$(themeContext, com.google.android.material.R.attr.colorSecondaryContainer, android.graphics.Color.GRAY)</ID>
-    <ID>ArgumentListWrapping:PairingActivity.kt$PairingActivity$(qrData, com.google.zxing.BarcodeFormat.QR_CODE, 512, 512)</ID>
-    <ID>ArgumentListWrapping:PairingActivity.kt$PairingActivity$(x, y)</ID>
-    <ID>ArgumentListWrapping:PairingActivity.kt$PairingActivity$(x, y, if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE)</ID>
     <ID>ArgumentListWrapping:SecurityUtils.kt$SecurityUtils$(TAG, "EncryptedSharedPreferences recovery failed, falling back to secure fallback storage", recoveryEx)</ID>
     <ID>ArgumentListWrapping:TvRemoteFragment.kt$TvRemoteFragment$(requireContext(), R.style.ThemeOverlay_App_RoyalPurple)</ID>
     <ID>ArgumentListWrapping:TvRemoteServer.kt$TvRemoteServer$( context, 0, launchIntent, android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE )</ID>
@@ -45,25 +37,19 @@
     <ID>EmptyFunctionBlock:LicensesActivity.kt$LicensesActivity.&lt;no name provided&gt;.&lt;no name provided&gt;${}</ID>
     <ID>EmptyFunctionBlock:PairingActivity.kt$PairingActivity.&lt;no name provided&gt;${}</ID>
     <ID>ImplicitDefaultLocale:TvRemoteServer.kt$TvRemoteServer.Companion$String.format("%06d", (0..999999).random())</ID>
-    <ID>ImportOrdering:AboutActivity.kt$import android.content.Intent import android.net.Uri import android.os.Bundle import android.view.MenuItem import android.view.View import android.view.ViewGroup import androidx.activity.enableEdgeToEdge import androidx.appcompat.app.AppCompatActivity import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import com.lnu.volumelockr.plus.R import com.lnu.volumelockr.plus.databinding.ActivityAboutBinding import com.lnu.volumelockr.plus.util.SecurityUtils</ID>
-    <ID>ImportOrdering:PairingActivity.kt$import android.app.UiModeManager import android.content.Context import android.content.Intent import android.content.IntentFilter import android.content.res.Configuration import android.os.Bundle import android.view.MenuItem import android.view.View import android.widget.Toast import androidx.activity.enableEdgeToEdge import androidx.appcompat.app.AppCompatActivity import androidx.core.content.ContextCompat import androidx.core.view.ViewCompat import androidx.core.view.WindowInsetsCompat import com.lnu.volumelockr.plus.R import com.lnu.volumelockr.plus.databinding.ActivityPairingBinding import com.lnu.volumelockr.plus.service.TvRemoteServer import com.lnu.volumelockr.plus.service.VolumeService import java.net.NetworkInterface import com.lnu.volumelockr.plus.util.SecurityUtils</ID>
     <ID>ImportOrdering:TvRemoteServer.kt$import android.content.Context import android.content.Intent import android.media.AudioManager import android.util.Log import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.Job import kotlinx.coroutines.isActive import kotlinx.coroutines.launch import kotlinx.coroutines.withContext import java.io.BufferedReader import java.io.InputStreamReader import java.io.OutputStream import java.net.ServerSocket import java.net.Socket import kotlinx.coroutines.CoroutineScope</ID>
+    <ID>ImportOrdering:VolumeService.kt$import android.app.Notification import android.app.NotificationChannel import android.app.NotificationManager import android.app.PendingIntent import android.app.Service import android.content.Context import android.content.Intent import android.database.ContentObserver import android.media.AudioManager import android.net.Uri import android.os.Binder import android.os.Build import android.os.Handler import android.os.IBinder import android.os.Looper import android.provider.Settings import androidx.annotation.RequiresApi import androidx.annotation.WorkerThread import androidx.core.content.edit import androidx.preference.PreferenceManager import com.google.gson.Gson import com.google.gson.reflect.TypeToken import com.lnu.volumelockr.plus.R import com.lnu.volumelockr.plus.ui.MainActivity import com.lnu.volumelockr.plus.ui.SettingsFragment.Companion.ALLOW_LOWER_PREFERENCE import com.lnu.volumelockr.plus.ui.Volume import java.util.Timer import java.util.TimerTask import com.lnu.volumelockr.plus.util.AppConstants</ID>
     <ID>Indentation:TvRemoteServer.kt$TvRemoteServer$ </ID>
     <ID>LongMethod:MainActivity.kt$MainActivity$@Suppress("DEPRECATION") private fun applyThemeColors(isTvRemote: Boolean)</ID>
     <ID>LongMethod:MainActivity.kt$MainActivity$private fun checkPermissions()</ID>
-    <ID>LongMethod:PairingActivity.kt$PairingActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
     <ID>LongMethod:PasswordSettingsFragment.kt$PasswordSettingsFragment$override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?)</ID>
     <ID>LongMethod:TvRemoteFragment.kt$TvRemoteFragment$override fun onViewCreated(view: View, savedInstanceState: Bundle?)</ID>
     <ID>LongMethod:TvRemoteFragment.kt$TvRemoteFragment$private fun testConnection()</ID>
     <ID>LongMethod:TvRemoteServer.kt$TvRemoteServer$private fun handleClient(client: Socket)</ID>
-    <ID>MagicNumber:AboutActivity.kt$AboutActivity$32</ID>
-    <ID>MagicNumber:AboutActivity.kt$AboutActivity$512</ID>
     <ID>MagicNumber:AdbController.kt$AdbController$10000</ID>
     <ID>MagicNumber:AdbController.kt$AdbController$3000</ID>
     <ID>MagicNumber:AdbController.kt$AdbController$5555</ID>
     <ID>MagicNumber:AdbKeyManager.kt$AdbKeyManager$2048</ID>
-    <ID>MagicNumber:LicensesActivity.kt$LicensesActivity$32</ID>
-    <ID>MagicNumber:LicensesActivity.kt$LicensesActivity$512</ID>
     <ID>MagicNumber:LicensesActivity.kt$LicensesActivity.&lt;no name provided&gt;$150</ID>
     <ID>MagicNumber:MainActivity.kt$MainActivity$0.5</ID>
     <ID>MagicNumber:MainActivity.kt$MainActivity$101</ID>
@@ -102,7 +88,6 @@
     <ID>MagicNumber:NavigationAnimationUtils.kt$NavigationAnimationUtils$85</ID>
     <ID>MagicNumber:NavigationAnimationUtils.kt$NavigationAnimationUtils$8f</ID>
     <ID>MagicNumber:NavigationAnimationUtils.kt$NavigationAnimationUtils$90</ID>
-    <ID>MagicNumber:PairingActivity.kt$PairingActivity$512</ID>
     <ID>MagicNumber:TvRemoteFragment.kt$TvRemoteFragment$100</ID>
     <ID>MagicNumber:TvRemoteFragment.kt$TvRemoteFragment$1000</ID>
     <ID>MagicNumber:TvRemoteFragment.kt$TvRemoteFragment$15f</ID>
@@ -136,11 +121,8 @@
     <ID>MagicNumber:VolumeSliderFragment.kt$VolumeSliderFragment$1.05f</ID>
     <ID>MagicNumber:VolumeSliderFragment.kt$VolumeSliderFragment$150</ID>
     <ID>MagicNumber:VolumeSliderFragment.kt$VolumeSliderFragment$8f</ID>
-    <ID>MaxLineLength:AboutActivity.kt$AboutActivity$val bits = com.google.zxing.qrcode.QRCodeWriter().encode(url, com.google.zxing.BarcodeFormat.QR_CODE, size, size)</ID>
     <ID>MaxLineLength:AdbController.kt$AdbController$if</ID>
     <ID>MaxLineLength:AdbController.kt$AdbController$stream = connection.open("shell:am start -n com.lnu.volumelockr.plus/com.lnu.volumelockr.plus.ui.MainActivity")</ID>
-    <ID>MaxLineLength:LicensesActivity.kt$LicensesActivity$super.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))</ID>
-    <ID>MaxLineLength:LicensesActivity.kt$LicensesActivity$val bits = com.google.zxing.qrcode.QRCodeWriter().encode(url, com.google.zxing.BarcodeFormat.QR_CODE, size, size)</ID>
     <ID>MaxLineLength:MainActivity.kt$MainActivity$if</ID>
     <ID>MaxLineLength:MainActivity.kt$MainActivity$val colorOnSecondaryContainer = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorOnSecondaryContainer, android.graphics.Color.BLACK)</ID>
     <ID>MaxLineLength:MainActivity.kt$MainActivity$val colorOnSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorOnSurfaceVariant, android.graphics.Color.GRAY)</ID>
@@ -152,10 +134,6 @@
     <ID>MaxLineLength:MainActivity.kt$MainActivity$val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager</ID>
     <ID>MaxLineLength:MainActivity.kt$MainActivity$val targetOnSurface = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorOnSurface, android.graphics.Color.WHITE)</ID>
     <ID>MaxLineLength:MainActivity.kt$MainActivity$val targetSurface = com.google.android.material.color.MaterialColors.getColor(themeContext, com.google.android.material.R.attr.colorSurface, android.graphics.Color.BLACK)</ID>
-    <ID>MaxLineLength:PairingActivity.kt$PairingActivity$bitmap.setPixel(x, y, if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE)</ID>
-    <ID>MaxLineLength:PairingActivity.kt$PairingActivity$intf.isUp &amp;&amp; !intf.isLoopback &amp;&amp; !intf.name.contains("p2p") &amp;&amp; !intf.name.contains("dummy") &amp;&amp; !intf.name.contains("tun")</ID>
-    <ID>MaxLineLength:PairingActivity.kt$PairingActivity$intf.isUp &amp;&amp; !intf.isLoopback &amp;&amp; (intf.name.startsWith("wlan") || intf.name.startsWith("eth")) &amp;&amp; !intf.name.contains("p2p")</ID>
-    <ID>MaxLineLength:PairingActivity.kt$PairingActivity$val bitMatrix = com.google.zxing.qrcode.QRCodeWriter().encode(qrData, com.google.zxing.BarcodeFormat.QR_CODE, 512, 512)</ID>
     <ID>MaxLineLength:SecurityUtils.kt$SecurityUtils$Log.e(TAG, "EncryptedSharedPreferences recovery failed, falling back to secure fallback storage", recoveryEx)</ID>
     <ID>MaxLineLength:TvRemoteFragment.kt$TvRemoteFragment$binding.volumeSlider</ID>
     <ID>MaxLineLength:TvRemoteFragment.kt$TvRemoteFragment$binding.volumeValueText.text = "${binding.volumeSlider.value.toInt()} / ${maxVol.toInt()}"</ID>
@@ -173,11 +151,8 @@
     <ID>MaxLineLength:VolumeSliderFragment.kt$VolumeSliderFragment$intf.isUp &amp;&amp; !intf.isLoopback &amp;&amp; !intf.name.contains("p2p") &amp;&amp; !intf.name.contains("dummy") &amp;&amp; !intf.name.contains("tun")</ID>
     <ID>MaxLineLength:VolumeSliderFragment.kt$VolumeSliderFragment$intf.isUp &amp;&amp; !intf.isLoopback &amp;&amp; (intf.name.startsWith("wlan") || intf.name.startsWith("eth")) &amp;&amp; !intf.name.contains("p2p")</ID>
     <ID>MaxLineLength:VolumeSliderFragment.kt$VolumeSliderFragment$val hideUnlock = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean("hide_tv_unlock_ui", true)</ID>
-    <ID>MaximumLineLength:AboutActivity.kt$AboutActivity$ </ID>
     <ID>MaximumLineLength:AdbController.kt$AdbController$ </ID>
-    <ID>MaximumLineLength:LicensesActivity.kt$LicensesActivity$ </ID>
     <ID>MaximumLineLength:MainActivity.kt$MainActivity$ </ID>
-    <ID>MaximumLineLength:PairingActivity.kt$PairingActivity$ </ID>
     <ID>MaximumLineLength:SecurityUtils.kt$SecurityUtils$ </ID>
     <ID>MaximumLineLength:TvRemoteFragment.kt$TvRemoteFragment$ </ID>
     <ID>MaximumLineLength:TvRemoteServer.kt$TvRemoteServer$ </ID>
@@ -190,16 +165,10 @@
     <ID>NestedBlockDepth:TvRemoteServer.kt$TvRemoteServer$private fun handleClient(client: Socket)</ID>
     <ID>NestedBlockDepth:VolumeService.kt$VolumeService$override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int</ID>
     <ID>NestedBlockDepth:VolumeSliderFragment.kt$VolumeSliderFragment$private fun getLocalIpAddress(): String?</ID>
-    <ID>NoBlankLineBeforeRbrace:AboutActivity.kt$AboutActivity$ </ID>
-    <ID>NoConsecutiveBlankLines:VolumeService.kt$VolumeService$ </ID>
     <ID>NoConsecutiveBlankLines:VolumeService.kt$VolumeService.&lt;no name provided&gt;$ </ID>
     <ID>NoConsecutiveBlankLines:VolumeSliderFragment.kt$VolumeSliderFragment$ </ID>
-    <ID>NoTrailingSpaces:AboutActivity.kt$AboutActivity$ </ID>
     <ID>NoTrailingSpaces:AdbController.kt$AdbController$ </ID>
-    <ID>NoTrailingSpaces:LicensesActivity.kt$LicensesActivity$ </ID>
-    <ID>NoTrailingSpaces:LicensesActivity.kt$LicensesActivity.&lt;no name provided&gt;$ </ID>
     <ID>NoTrailingSpaces:MainActivity.kt$MainActivity$ </ID>
-    <ID>NoTrailingSpaces:PairingActivity.kt$PairingActivity$ </ID>
     <ID>NoTrailingSpaces:SettingsFragment.kt$SettingsFragment$ </ID>
     <ID>NoTrailingSpaces:TvRemoteFragment.kt$TvRemoteFragment$ </ID>
     <ID>NoTrailingSpaces:TvRemoteServer.kt$TvRemoteServer$ </ID>
@@ -207,8 +176,6 @@
     <ID>NoTrailingSpaces:VolumeAdapter.kt$VolumeAdapter$ </ID>
     <ID>NoTrailingSpaces:VolumeService.kt$VolumeService$ </ID>
     <ID>NoTrailingSpaces:VolumeSliderFragment.kt$VolumeSliderFragment$ </ID>
-    <ID>NoUnusedImports:AboutActivity.kt$com.lnu.volumelockr.plus.ui.AboutActivity.kt</ID>
-    <ID>NoUnusedImports:LicensesActivity.kt$com.lnu.volumelockr.plus.ui.LicensesActivity.kt</ID>
     <ID>NoUnusedImports:SecurityUtils.kt$com.lnu.volumelockr.plus.util.SecurityUtils.kt</ID>
     <ID>NoUnusedImports:TvRemoteServer.kt$com.lnu.volumelockr.plus.service.TvRemoteServer.kt</ID>
     <ID>NoUnusedImports:VolumeAdapter.kt$com.lnu.volumelockr.plus.ui.VolumeAdapter.kt</ID>
@@ -218,7 +185,6 @@
     <ID>PrintStackTrace:PairingActivity.kt$PairingActivity$e</ID>
     <ID>PrintStackTrace:VolumeSliderFragment.kt$VolumeSliderFragment$e</ID>
     <ID>SpacingBetweenDeclarationsWithAnnotations:TvRemoteServer.kt$TvRemoteServer.Companion$@Volatile private var pinTimestamp: Long = 0L</ID>
-    <ID>SwallowedException:AboutActivity.kt$AboutActivity$e: Exception</ID>
     <ID>SwallowedException:AdbController.kt$AdbController$e: Exception</ID>
     <ID>SwallowedException:SecurityUtils.kt$SecurityUtils$e: Exception</ID>
     <ID>SwallowedException:TvRemoteFragment.kt$TvRemoteFragment$e: Exception</ID>
@@ -227,7 +193,6 @@
     <ID>SwallowedException:VolumeAdapter.kt$VolumeAdapter$e: SecurityException</ID>
     <ID>SwallowedException:VolumeService.kt$VolumeService$e: SecurityException</ID>
     <ID>SwallowedException:VolumeService.kt$VolumeService.Companion$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:AboutActivity.kt$AboutActivity$e: Exception</ID>
     <ID>TooGenericExceptionCaught:AdbController.kt$AdbController$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MainActivity.kt$MainActivity$e: Exception</ID>
     <ID>TooGenericExceptionCaught:PairingActivity.kt$PairingActivity$e: Exception</ID>

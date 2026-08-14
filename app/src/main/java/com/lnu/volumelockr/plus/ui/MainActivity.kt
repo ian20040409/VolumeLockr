@@ -104,15 +104,36 @@ class MainActivity : AppCompatActivity() {
             if (animate) {
                 android.transition.TransitionManager.beginDelayedTransition(banner)
             }
+            val density = resources.displayMetrics.density
             if (isBannerCollapsed) {
                 binding.permissionBannerTextContainer?.visibility = android.view.View.GONE
                 binding.permissionBannerButton?.visibility = android.view.View.GONE
                 binding.permissionBannerToggle?.visibility = android.view.View.GONE
+
+                val padH = (BANNER_PAD_COLLAPSED_H_DP * density).toInt()
+                val padV = (BANNER_PAD_COLLAPSED_V_DP * density).toInt()
+                binding.permissionBannerContent?.setPadding(padH, padV, padH, padV)
+
+                binding.permissionBannerIcon?.layoutParams = binding.permissionBannerIcon?.layoutParams?.apply {
+                    width = (BANNER_ICON_COLLAPSED_DP * density).toInt()
+                    height = (BANNER_ICON_COLLAPSED_DP * density).toInt()
+                }
+                banner.radius = BANNER_RADIUS_COLLAPSED_DP * density
             } else {
                 binding.permissionBannerTextContainer?.visibility = android.view.View.VISIBLE
                 binding.permissionBannerButton?.visibility = android.view.View.VISIBLE
                 binding.permissionBannerToggle?.visibility = android.view.View.VISIBLE
                 binding.permissionBannerToggle?.setImageResource(R.drawable.ic_expand_less)
+
+                val padH = (BANNER_PAD_EXPANDED_H_DP * density).toInt()
+                val padV = (BANNER_PAD_EXPANDED_V_DP * density).toInt()
+                binding.permissionBannerContent?.setPadding(padH, padV, padH, padV)
+
+                binding.permissionBannerIcon?.layoutParams = binding.permissionBannerIcon?.layoutParams?.apply {
+                    width = (BANNER_ICON_EXPANDED_DP * density).toInt()
+                    height = (BANNER_ICON_EXPANDED_DP * density).toInt()
+                }
+                banner.radius = BANNER_RADIUS_EXPANDED_DP * density
             }
         }
     }
@@ -475,5 +496,16 @@ class MainActivity : AppCompatActivity() {
         val windowInsetsController = androidx.core.view.WindowInsetsControllerCompat(window, window.decorView)
         windowInsetsController.isAppearanceLightStatusBars = isLightSurface
         windowInsetsController.isAppearanceLightNavigationBars = isLightBottomNavBg
+    }
+
+    companion object {
+        private const val BANNER_ICON_COLLAPSED_DP = 16
+        private const val BANNER_ICON_EXPANDED_DP = 24
+        private const val BANNER_RADIUS_COLLAPSED_DP = 8f
+        private const val BANNER_RADIUS_EXPANDED_DP = 16f
+        private const val BANNER_PAD_COLLAPSED_H_DP = 6
+        private const val BANNER_PAD_COLLAPSED_V_DP = 4
+        private const val BANNER_PAD_EXPANDED_H_DP = 12
+        private const val BANNER_PAD_EXPANDED_V_DP = 8
     }
 }
