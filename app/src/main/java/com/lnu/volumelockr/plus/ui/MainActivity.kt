@@ -20,11 +20,6 @@ import com.lnu.volumelockr.plus.util.SecurityUtils
 
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-        var isAppUnlocked = false
-    }
-
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
@@ -41,11 +36,11 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         binding.unlockButton?.setOnClickListener {
-            if (!isAppUnlocked && (SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this))) {
+            if (!SecurityUtils.isAppUnlocked && (SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this))) {
                 SecurityUtils.authenticate(
                     this,
                     onSuccess = {
-                        isAppUnlocked = true
+                        SecurityUtils.isAppUnlocked = true
                         binding.lockOverlay?.visibility = android.view.View.GONE
                     },
                     onCancel = {
@@ -56,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (!isAppUnlocked && (SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this))) {
+        if (!SecurityUtils.isAppUnlocked && (SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this))) {
             binding.lockOverlay?.visibility = android.view.View.VISIBLE
             // Automatically trigger the authentication dialog when the app starts and is locked
             binding.unlockButton?.performClick()
@@ -80,9 +75,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (!isChangingConfigurations) {
-            isAppUnlocked = false
-        }
     }
 
     override fun onDestroy() {

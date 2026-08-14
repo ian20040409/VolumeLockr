@@ -25,9 +25,4 @@
         android:name="com.lnu.volumelockr.plus.ui.TvRemoteFragment"
         android:label="TV Remote" />
 
-    <fragment
-        android:id="@+id/passwordSettingsFragment"
-        android:name="com.lnu.volumelockr.plus.ui.PasswordSettingsFragment"
-        android:label="@string/password_header" />
-
 </navigation>

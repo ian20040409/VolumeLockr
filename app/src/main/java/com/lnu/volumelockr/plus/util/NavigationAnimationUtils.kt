@@ -1,6 +1,5 @@
 package com.lnu.volumelockr.plus.util
 
-import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
@@ -18,8 +17,6 @@ object NavigationAnimationUtils {
      */
     fun animateNavigationItem(itemId: Int, itemView: View?) {
         if (itemView == null) return
-
-        itemView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
 
         // Animate the label text with a synchronized micro-pulse
         val labelGroup = itemView.findViewById<View>(

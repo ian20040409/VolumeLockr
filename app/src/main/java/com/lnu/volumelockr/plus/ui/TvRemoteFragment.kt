@@ -116,7 +116,6 @@ class TvRemoteFragment : Fragment() {
         binding.volumeSlider.addOnChangeListener { slider, value, fromUser ->
             binding.volumeValueText.text = "${value.toInt()} / ${binding.volumeSlider.valueTo.toInt()}"
             if (fromUser) {
-                slider.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
                 sendVolumeCommand(value.toInt())
             }
         }
@@ -133,6 +132,7 @@ class TvRemoteFragment : Fragment() {
         
         binding.volumeSlider.addOnSliderTouchListener(object : com.google.android.material.slider.Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                slider.parent?.requestDisallowInterceptTouchEvent(true)
                 isTrackingTouch = true
             }
             override fun onStopTrackingTouch(slider: com.google.android.material.slider.Slider) {
@@ -141,18 +141,15 @@ class TvRemoteFragment : Fragment() {
         })
 
         binding.lockButton.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             val volume = binding.volumeSlider.value.toInt()
             sendLockCommand(volume, true)
         }
 
         binding.unlockButton.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             sendLockCommand(0, false)
         }
         
         binding.launchAppButton.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             sendLaunchCommand()
         }
     }

@@ -105,7 +105,6 @@ class VolumeSliderFragment : Fragment() {
 
     private fun setupQuickActions() {
         binding.toggleLockAllButton.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             val service = mService ?: return@setOnClickListener
             val isAllLocked = service.getLocks().size == service.getVolumes().size
             if (isAllLocked) {

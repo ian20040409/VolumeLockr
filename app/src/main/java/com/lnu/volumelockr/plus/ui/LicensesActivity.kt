@@ -1,53 +1,40 @@
 package com.lnu.volumelockr.plus.ui
 
+import android.app.UiModeManager
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lnu.volumelockr.plus.R
 import com.lnu.volumelockr.plus.databinding.ActivityLicensesBinding
+import com.lnu.volumelockr.plus.util.UrlLaunchUtils
 import com.mikepenz.aboutlibraries.LibsBuilder
 
-class LicensesActivity : AppCompatActivity() {
+class LicensesActivity : BaseSecuredActivity() {
+
+    private lateinit var binding: ActivityLicensesBinding
+    private var isOpeningUrl = false
+
+    override fun getSecuredContentView(): View = binding.aboutLibsContainer
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityLicensesBinding.inflate(layoutInflater)
+        binding = ActivityLicensesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { v, windowInsets ->
-            val bars = windowInsets.getInsets(
-                WindowInsetsCompat.Type.systemBars()
-                    or WindowInsetsCompat.Type.displayCutout()
-            )
-            v.setPadding(bars.left, bars.top, bars.right, 0)
-            windowInsets
-        }
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.aboutLibsContainer) { v, windowInsets ->
-            val bars = windowInsets.getInsets(
-                WindowInsetsCompat.Type.systemBars()
-                    or WindowInsetsCompat.Type.displayCutout()
-            )
-            v.setPadding(bars.left, 0, bars.right, bars.bottom)
-            windowInsets
-        }
+        setupStandardInsets(binding.appBarLayout, binding.aboutLibsContainer)
 
         setSupportActionBar(binding.toolbar)
-        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
-        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        val uiModeManager = getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager
+        val isTv = uiModeManager?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
         supportActionBar?.title = getString(R.string.open_source_licenses)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
+            @Suppress("DEPRECATION")
             val libsFragment = LibsBuilder().supportFragment()
             supportFragmentManager.beginTransaction()
                 .add(R.id.about_libs_container, libsFragment)
@@ -58,9 +45,9 @@ class LicensesActivity : AppCompatActivity() {
             val checkRunnable = object : Runnable {
                 override fun run() {
                     if (isDestroyed || isFinishing) return
-                    val recyclerView = findRecyclerView(binding.root)
+                    val recyclerView = UrlLaunchUtils.findRecyclerView(binding.root)
                     val adapter = recyclerView?.adapter
-                    
+
                     if (recyclerView != null && adapter != null && recyclerView.childCount > 0) {
                         recyclerView.isFocusable = false
                         val attachListener = object : RecyclerView.OnChildAttachStateChangeListener {
@@ -71,7 +58,7 @@ class LicensesActivity : AppCompatActivity() {
                             override fun onChildViewDetachedFromWindow(view: View) {}
                         }
                         recyclerView.addOnChildAttachStateChangeListener(attachListener)
-                        
+
                         for (i in 0 until recyclerView.childCount) {
                             attachListener.onChildViewAttachedToWindow(recyclerView.getChildAt(i))
                         }
@@ -84,80 +71,17 @@ class LicensesActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun openUrl(url: String) {
-        val uiModeManager = getSystemService(android.content.Context.UI_MODE_SERVICE) as android.app.UiModeManager
-        val isTv = uiModeManager.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
-        
-        if (isTv) {
-            showQrCodeDialog(url)
-            return
-        }
-
-        runCatching {
-            val customTabsIntent = androidx.browser.customtabs.CustomTabsIntent.Builder()
-                .setShowTitle(true)
-                .build()
-            customTabsIntent.launchUrl(this, android.net.Uri.parse(url))
-        }.onFailure {
-            runCatching {
-                super.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
-            }.onFailure {
-                showQrCodeDialog(url)
-            }
-        }
-    }
-
-    private fun showQrCodeDialog(url: String) {
-        runCatching {
-            val size = 512
-            val bits = com.google.zxing.qrcode.QRCodeWriter().encode(url, com.google.zxing.BarcodeFormat.QR_CODE, size, size)
-            val bmp = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.RGB_565)
-            for (x in 0 until size) {
-                for (y in 0 until size) {
-                    bmp.setPixel(x, y, if (bits[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
-                }
-            }
-            
-            val imageView = android.widget.ImageView(this).apply {
-                setImageBitmap(bmp)
-                setPadding(32, 32, 32, 32)
-            }
-            
-            val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle(url)
-                .setView(imageView)
-                .setPositiveButton(android.R.string.ok, null)
-                .create()
-                
-            dialog.setOnShowListener {
-                dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.requestFocus()
-            }
-            
-            dialog.show()
-        }
-    }
-
-    override fun startActivity(intent: android.content.Intent?) {
+    override fun startActivity(intent: Intent?) {
         startActivity(intent, null)
     }
 
-    private var isOpeningUrl = false
-
-    override fun startActivity(intent: android.content.Intent?, options: Bundle?) {
-        if (!isOpeningUrl && intent?.action == android.content.Intent.ACTION_VIEW) {
+    override fun startActivity(intent: Intent?, options: Bundle?) {
+        if (!isOpeningUrl && intent?.action == Intent.ACTION_VIEW) {
             val url = intent.dataString
             if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
                 isOpeningUrl = true
                 try {
-                    openUrl(url)
+                    UrlLaunchUtils.openUrl(this, url)
                 } finally {
                     isOpeningUrl = false
                 }
@@ -165,17 +89,5 @@ class LicensesActivity : AppCompatActivity() {
             }
         }
         super.startActivity(intent, options)
-    }
-
-    private fun findRecyclerView(view: View): RecyclerView? {
-        if (view is RecyclerView) return view
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) {
-                val child = view.getChildAt(i)
-                val rv = findRecyclerView(child)
-                if (rv != null) return rv
-            }
-        }
-        return null
     }
 }

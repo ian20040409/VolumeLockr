@@ -2,9 +2,9 @@ package com.lnu.volumelockr.plus.ui
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -41,7 +41,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         hideTvLauncherIcon = findPreference(HIDE_TV_LAUNCHER_ICON_PREFERENCE)
 
         findPreference<Preference>(PASSWORD_SETTINGS_ENTRY)?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.passwordSettingsFragment)
+            startActivity(Intent(requireContext(), PasswordActivity::class.java))
             true
         }
 

@@ -53,18 +53,24 @@ class VolumeAdapter(
         )
     }
 
+    private var activeDraggingStream: Int? = null
+
     private var mAudioManager: AudioManager =
         mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     @MainThread
     fun update(volumes: List<Volume>) {
         mVolumeList = volumes
-        update()
+        if (activeDraggingStream == null) {
+            notifyDataSetChanged()
+        }
     }
 
     @MainThread
     fun update() {
-        notifyDataSetChanged()
+        if (activeDraggingStream == null) {
+            notifyDataSetChanged()
+        }
     }
 
     inner class ViewHolder(val binding: VolumeCardBinding) : RecyclerView.ViewHolder(binding.root)
@@ -80,10 +86,14 @@ class VolumeAdapter(
         holder.binding.mediaTextView.text = volume.name
         holder.binding.streamIcon.setImageResource(STREAM_ICONS[volume.stream] ?: R.drawable.ic_media)
         applyStreamColors(holder, volume.stream, isLocked)
-        holder.binding.slider.value = mService?.getLocks()?.get(volume.stream)?.toFloat() ?: volume.value.toFloat()
-        holder.binding.slider.valueFrom = volume.min.toFloat()
-        holder.binding.slider.valueTo = volume.max.toFloat()
-        holder.binding.volumeValue.text = formatVolumeValue(holder.binding.slider.value.toInt(), volume.max)
+        val currentLockVal = mService?.getLocks()?.get(volume.stream)?.toFloat()
+        val displayVal = currentLockVal ?: volume.value.toFloat()
+        if (activeDraggingStream != volume.stream) {
+            holder.binding.slider.valueFrom = volume.min.toFloat()
+            holder.binding.slider.valueTo = volume.max.toFloat()
+            holder.binding.slider.value = displayVal.coerceIn(volume.min.toFloat(), volume.max.toFloat())
+            holder.binding.volumeValue.text = formatVolumeValue(holder.binding.slider.value.toInt(), volume.max)
+        }
 
         holder.binding.volumeValue.setOnClickListener {
             showDirectVolumeInputDialog(holder, volume)
@@ -193,10 +203,23 @@ class VolumeAdapter(
 
     private fun registerSeekBarCallback(holder: ViewHolder, volume: Volume) {
         holder.binding.slider.clearOnChangeListeners()
+        holder.binding.slider.clearOnSliderTouchListeners()
+
+        holder.binding.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+                slider.parent?.requestDisallowInterceptTouchEvent(true)
+                activeDraggingStream = volume.stream
+            }
+
+            override fun onStopTrackingTouch(slider: Slider) {
+                activeDraggingStream = null
+                slider.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+        })
+
         holder.binding.slider.addOnChangeListener(
             Slider.OnChangeListener { slider, value, fromUser ->
                 if (!fromUser) return@OnChangeListener
-                slider.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
 
                 if (isDndRestricted(volume.stream)) {
                     val now = System.currentTimeMillis()
@@ -228,7 +251,6 @@ class VolumeAdapter(
 
     private fun registerLockButtonCallback(holder: ViewHolder, volume: Volume) {
         holder.binding.lockButton.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
             val isLocked = mService?.getLocks()?.containsKey(volume.stream) == true
             if (isLocked) {
                 onVolumeUnlocked(holder, volume)

@@ -20,6 +20,8 @@ import com.lnu.volumelockr.plus.service.TvRemoteServer
 import com.lnu.volumelockr.plus.service.VolumeService
 import java.net.NetworkInterface
 
+import com.lnu.volumelockr.plus.util.SecurityUtils
+
 class PairingActivity : AppCompatActivity() {
 
     private var isBound = false
@@ -48,6 +50,22 @@ class PairingActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        val isSecured = SecurityUtils.isPasswordProtected(this) || SecurityUtils.isBiometricEnabled(this)
+        if (isSecured && !SecurityUtils.isAppUnlocked) {
+            binding.nestedScrollView.visibility = View.INVISIBLE
+            SecurityUtils.authenticate(
+                this,
+                onSuccess = {
+                    SecurityUtils.isAppUnlocked = true
+                    binding.nestedScrollView.visibility = View.VISIBLE
+                },
+                onCancel = {
+                    finish()
+                }
+            )
+        } else {
+            binding.nestedScrollView.visibility = View.VISIBLE
+        }
         VolumeService.start(this)
         val intent = Intent(this, VolumeService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
