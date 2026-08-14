@@ -83,6 +83,8 @@ class MainActivity : AppCompatActivity() {
         activeDndDialog = null
         themeAnimator?.cancel()
         themeAnimator = null
+        bannerRadiusAnimator?.cancel()
+        bannerRadiusAnimator = null
         super.onDestroy()
     }
 
@@ -98,42 +100,70 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var isBannerCollapsed = false
+    private var bannerRadiusAnimator: android.animation.ValueAnimator? = null
 
     private fun updateBannerCollapsedState(animate: Boolean = true) {
-        binding.permissionBanner?.let { banner ->
-            if (animate) {
-                android.transition.TransitionManager.beginDelayedTransition(banner)
+        val banner = binding.permissionBanner ?: return
+        val root = binding.root as? android.view.ViewGroup ?: return
+        val density = resources.displayMetrics.density
+
+        val targetRadius = if (isBannerCollapsed) {
+            BANNER_RADIUS_COLLAPSED_DP * density
+        } else {
+            BANNER_RADIUS_EXPANDED_DP * density
+        }
+
+        if (animate) {
+            val transition = android.transition.TransitionSet().apply {
+                ordering = android.transition.TransitionSet.ORDERING_TOGETHER
+                duration = BANNER_ANIM_DURATION_MS
+                interpolator = createFastOutSlowInInterpolator()
+                addTransition(android.transition.ChangeBounds())
+                addTransition(android.transition.Fade())
             }
-            val density = resources.displayMetrics.density
-            if (isBannerCollapsed) {
-                binding.permissionBannerTextContainer?.visibility = android.view.View.GONE
-                binding.permissionBannerButton?.visibility = android.view.View.GONE
-                binding.permissionBannerToggle?.visibility = android.view.View.GONE
+            android.transition.TransitionManager.beginDelayedTransition(root, transition)
 
-                val padH = (BANNER_PAD_COLLAPSED_H_DP * density).toInt()
-                val padV = (BANNER_PAD_COLLAPSED_V_DP * density).toInt()
-                binding.permissionBannerContent?.setPadding(padH, padV, padH, padV)
-
-                binding.permissionBannerIcon?.layoutParams = binding.permissionBannerIcon?.layoutParams?.apply {
-                    width = (BANNER_ICON_COLLAPSED_DP * density).toInt()
-                    height = (BANNER_ICON_COLLAPSED_DP * density).toInt()
+            bannerRadiusAnimator?.cancel()
+            val startRadius = banner.radius
+            bannerRadiusAnimator = android.animation.ValueAnimator.ofFloat(startRadius, targetRadius).apply {
+                duration = BANNER_ANIM_DURATION_MS
+                interpolator = createFastOutSlowInInterpolator()
+                addUpdateListener { animator ->
+                    banner.radius = animator.animatedValue as Float
                 }
-                banner.radius = BANNER_RADIUS_COLLAPSED_DP * density
-            } else {
-                binding.permissionBannerTextContainer?.visibility = android.view.View.VISIBLE
-                binding.permissionBannerButton?.visibility = android.view.View.VISIBLE
-                binding.permissionBannerToggle?.visibility = android.view.View.VISIBLE
-                binding.permissionBannerToggle?.setImageResource(R.drawable.ic_expand_less)
+                start()
+            }
+        } else {
+            bannerRadiusAnimator?.cancel()
+            banner.radius = targetRadius
+        }
 
-                val padH = (BANNER_PAD_EXPANDED_H_DP * density).toInt()
-                val padV = (BANNER_PAD_EXPANDED_V_DP * density).toInt()
-                binding.permissionBannerContent?.setPadding(padH, padV, padH, padV)
+        if (isBannerCollapsed) {
+            binding.permissionBannerTextContainer?.visibility = android.view.View.GONE
+            binding.permissionBannerButton?.visibility = android.view.View.GONE
+            binding.permissionBannerToggle?.visibility = android.view.View.GONE
 
-                binding.permissionBannerIcon?.layoutParams = binding.permissionBannerIcon?.layoutParams?.apply {
-                    width = (BANNER_ICON_EXPANDED_DP * density).toInt()
-                    height = (BANNER_ICON_EXPANDED_DP * density).toInt()
-                }
-                banner.radius = BANNER_RADIUS_EXPANDED_DP * density
+            val padH = (BANNER_PAD_COLLAPSED_H_DP * density).toInt()
+            val padV = (BANNER_PAD_COLLAPSED_V_DP * density).toInt()
+            binding.permissionBannerContent?.setPadding(padH, padV, padH, padV)
+
+            binding.permissionBannerIcon?.layoutParams = binding.permissionBannerIcon?.layoutParams?.apply {
+                width = (BANNER_ICON_COLLAPSED_DP * density).toInt()
+                height = (BANNER_ICON_COLLAPSED_DP * density).toInt()
+            }
+        } else {
+            binding.permissionBannerTextContainer?.visibility = android.view.View.VISIBLE
+            binding.permissionBannerButton?.visibility = android.view.View.VISIBLE
+            binding.permissionBannerToggle?.visibility = android.view.View.VISIBLE
+            binding.permissionBannerToggle?.setImageResource(R.drawable.ic_expand_less)
+
+            val padH = (BANNER_PAD_EXPANDED_H_DP * density).toInt()
+            val padV = (BANNER_PAD_EXPANDED_V_DP * density).toInt()
+            binding.permissionBannerContent?.setPadding(padH, padV, padH, padV)
+
+            binding.permissionBannerIcon?.layoutParams = binding.permissionBannerIcon?.layoutParams?.apply {
+                width = (BANNER_ICON_EXPANDED_DP * density).toInt()
+                height = (BANNER_ICON_EXPANDED_DP * density).toInt()
             }
         }
     }
@@ -499,6 +529,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val BANNER_ANIM_DURATION_MS = 250L
         private const val BANNER_ICON_COLLAPSED_DP = 16
         private const val BANNER_ICON_EXPANDED_DP = 24
         private const val BANNER_RADIUS_COLLAPSED_DP = 8f
@@ -507,5 +538,17 @@ class MainActivity : AppCompatActivity() {
         private const val BANNER_PAD_COLLAPSED_V_DP = 4
         private const val BANNER_PAD_EXPANDED_H_DP = 12
         private const val BANNER_PAD_EXPANDED_V_DP = 8
+
+        private const val INTERPOLATOR_X1 = 0.4f
+        private const val INTERPOLATOR_Y1 = 0.0f
+        private const val INTERPOLATOR_X2 = 0.2f
+        private const val INTERPOLATOR_Y2 = 1.0f
+
+        fun createFastOutSlowInInterpolator() = android.view.animation.PathInterpolator(
+            INTERPOLATOR_X1,
+            INTERPOLATOR_Y1,
+            INTERPOLATOR_X2,
+            INTERPOLATOR_Y2
+        )
     }
 }
